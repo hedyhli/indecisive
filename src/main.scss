@@ -1,0 +1,9 @@
+@use "bulma/sass" with (
+$info: hsla(197, 93%, 29%, 1),
+$link: hsla(187, 97%, 29%, 1),
+$primary: hsla(174, 100%, 33%, 1),
+$success: hsla(167, 77%, 57%, 0.49),
+$warning: hsla(63, 69%, 85%, 1),
+$danger: hsl(0deg 87.23% 74.77%),
+$box-shadow: none,
+);

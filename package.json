@@ -1,21 +1,26 @@
 {
-  "name": "vite-template-solid",
+  "name": "indecisive",
   "version": "0.0.0",
   "description": "",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "build-bulma": "sass --load-path=node_modules src/main.scss src/bulma.css",
+    "start-bulma": "pnpm run build-bulma -- --watch"
   },
   "license": "MIT",
   "devDependencies": {
     "solid-devtools": "^0.29.2",
     "typescript": "^5.3.3",
+    "typescript-language-server": "^4.3.3",
     "vite": "^5.0.11",
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
+    "bulma": "^1.0.0",
+    "sass": "^1.72.0",
     "solid-js": "^1.8.11"
   }
 }
