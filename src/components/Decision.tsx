@@ -1,5 +1,8 @@
-import type { Component, JSX } from 'solid-js';
-import { createSignal } from 'solid-js';
+import type { Component } from 'solid-js';
+import { createSignal, createContext, useContext } from 'solid-js';
+import type { SetStoreFunction } from 'solid-js/store';
+
+type NotUndefined<T> = Exclude<T, undefined>;
 
 export type TOption = {
 	name: string;
@@ -18,6 +21,13 @@ export type TDecision = {
 	factors: TFactor[];
 }
 
+export type DecisionStore = {
+	d: TDecision[];
+}
+
+type storeTuple = [DecisionStore, SetStoreFunction<DecisionStore>];
+export const DContext = createContext<NotUndefined<storeTuple>>()
+
 export const JumpListItem: Component<{
 	decision: TDecision,
 }> = (props) => {
@@ -26,10 +36,12 @@ export const JumpListItem: Component<{
 	</li>;
 };
 
-export const Decision: Component<{
-	decision: TDecision,
-	remover: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>,
-}> = (props) => {
+export const Decision: Component<{decision: TDecision}> = (props) => {
+	const D = props.decision
+	// TODO: Type it
+	const {state, setState} = useContext(DContext);
+	const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((D) => D.id !== id))
+
 	// Below is a testing demonstration of using basic signals
 	let input: HTMLInputElement
 
@@ -47,8 +59,6 @@ export const Decision: Component<{
 		setShow(() => value())
 	}
 
-	const D = props.decision
-
 	// Actual decision table component I'll prolly use
 	return <div class="card has-background-black-ter" id={`decision${D.id}`}>
 		<div class="card-content">
@@ -58,7 +68,7 @@ export const Decision: Component<{
 				</div>
 				<div class="level-right">
 					<div class="level-item">
-						<button onClick={props.remover} class="button is-small is-outlined is-danger">X</button>
+						<button onClick={() => rmDecision(D.id)} class="button is-small is-outlined is-danger">X</button>
 					</div>
 				</div>
 			</div>

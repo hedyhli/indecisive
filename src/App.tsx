@@ -1,15 +1,10 @@
 import type { Component } from 'solid-js';
-import { createSignal, createEffect } from 'solid-js';
+import { createEffect } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { For, Show } from 'solid-js/web'
 
-import { Decision, JumpListItem } from './components/Decision'
-import type { TDecision } from './components/Decision'
+import { Decision, JumpListItem, DContext, DecisionStore } from './components/Decision'
 
-
-type DecisionStore = {
-	d: TDecision[];
-}
 
 const LOCAL_STORAGE_KEY = "todos-solid";
 function createLocalStore<T extends object>(value: T) {
@@ -32,8 +27,6 @@ const App: Component = () => {
 		])
 	}
 
-	const rmDecision = (id: number) => setState("d", (d) => d.filter((D) => D.id !== id))
-
 	return (
 		<div class="columns is-gapless">
 			<aside class="column is-one-fifth mr-6" style="border-right: 2px solid var(--bulma-grey-darker)">
@@ -47,13 +40,21 @@ const App: Component = () => {
 				</Show>
 			</aside>
 			<main class="column">
-				<h3 class="title is-3">Decisions</h3>
 				<div class="block">
-					<For each={state.d}>{(D) => (
-						<Decision decision={D} remover={() => rmDecision(D.id)} />
-					)}</For>
+					<h3 class="title is-3">Decisions</h3>
 				</div>
-				<button class="block button is-primary is-outlined" onclick={addDecision}>+ Add Decision</button>
+				<div class="block">
+					<Show when={state.d.length > 0} fallback={<p>Hooray, no decisions to make!!!</p>}>
+						<For each={state.d}>{(D) => (
+							<DContext.Provider value={{state, setState}}>
+								<Decision decision={D} />
+							</DContext.Provider>
+						)}</For>
+					</Show>
+				</div>
+				<div class="block">
+					<button class="button is-primary is-outlined" onclick={addDecision}>+ Add Decision</button>
+				</div>
 			</main>
 		</div>
 	);
@@ -62,7 +63,7 @@ const App: Component = () => {
 /* TODO
  *
  * Decision:
- * Use solid-js/store for a single decision
+ * X Use solid-js/store for a single decision
  * On each input field change, update store
  * Buttons for adding rows/cols:
  *   Will update relevant arrays in store
@@ -72,10 +73,10 @@ const App: Component = () => {
  *   So it's actually usable!
  *
  * App:
- * Use store for an array of decision (IDs?)
- * "Add decision" will append to this array
- * Possible need of sharing context for decisiosn between App and Decision
- * Use the array of known decisions, and the context, to produce the jump list
+ * X Use store for an array of decision (IDs?)
+ * X "Add decision" will append to this array
+ * X Possible need of sharing context for decisiosn between App and Decision
+ * X Use the array of known decisions, and the context, to produce the jump list
  *
  * */
 
