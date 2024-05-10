@@ -1,45 +1,47 @@
 import type { Component } from 'solid-js';
-import { createSignal, createContext, useContext } from 'solid-js';
-import type { SetStoreFunction } from 'solid-js/store';
 
-type NotUndefined<T> = Exclude<T, undefined>;
+import { createSignal, useContext } from 'solid-js';
+import { For, Show } from 'solid-js/web'
 
-export type TOption = {
-	name: string;
-	values: number[]
+import type { TDecision } from './model'
+import { DContext } from './model'
+
+
+export const Decisions: Component = () => {
+	const {state, setState} = useContext(DContext);
+
+	const addDecision = () => {
+		setState("d", (d: TDecision[]) => {
+			const id = d.length === 0 ? 0 : d[d.length-1].id + 1
+			return [
+				...d,
+				{id, title: `Decision ${id}`, options: [], factors: []}
+			]
+		})
+	}
+
+	return <div>
+		<div class="block">
+			<h3 class="title is-3">Decisions</h3>
+		</div>
+		<div class="block">
+			<Show when={state.d.length > 0} fallback={<p>Hooray, no decisions to make!!!</p>}>
+				<For each={state.d}>{(D) => (
+					<Decision decision={D} />
+				)}</For>
+			</Show>
+		</div>
+		<br />
+		<div class="block">
+			<button class="button is-primary is-outlined" onclick={addDecision}>+ Add Decision</button>
+		</div>
+	</div>
 }
-
-export type TFactor = {
-	name: string;
-	weight: number;
-}
-
-export type TDecision = {
-	id: number;
-	title: string;
-	options: TOption[];
-	factors: TFactor[];
-}
-
-export type DecisionStore = {
-	d: TDecision[];
-}
-
-type storeTuple = [DecisionStore, SetStoreFunction<DecisionStore>];
-export const DContext = createContext<NotUndefined<storeTuple>>()
-
-export const JumpListItem: Component<{
-	decision: TDecision,
-}> = (props) => {
-	return <li class="menu-list">
-		<a href={`#decision${props.decision.id}`}>{props.decision.title}</a>
-	</li>;
-};
 
 export const Decision: Component<{decision: TDecision}> = (props) => {
 	const D = props.decision
-	// TODO: Type it
 	const {state, setState} = useContext(DContext);
+
 	const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((D) => D.id !== id))
 
 	// Below is a testing demonstration of using basic signals
