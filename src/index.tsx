@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 
-import 'bulma/css/bulma.css'
+import './main.scss'
 import App from './App';
 
 const root = document.getElementById('root');

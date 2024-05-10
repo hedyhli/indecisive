@@ -2,7 +2,6 @@ import type { Component } from 'solid-js';
 
 import { Decision } from './components/Decision'
 
-import './bulma.css'
 
 const App: Component = () => {
 	return (

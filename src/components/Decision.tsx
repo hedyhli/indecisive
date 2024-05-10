@@ -1,9 +1,9 @@
 import type { Component } from 'solid-js';
-import { createSignal, createEffect } from 'solid-js';
+import { createSignal } from 'solid-js';
 
 export const Decision: Component = () => {
 	// Below is a testing demonstration of using basic signals
-	let input
+	let input: HTMLInputElement
 
 	// Storing a specific input field value
 	const [value, setValue] = createSignal("Default name");
@@ -12,11 +12,11 @@ export const Decision: Component = () => {
 
 	// Input value changed, store it
 	const changed = () => {
-		setValue((prev) => input.value);
+		setValue(() => input.value);
 	}
 	// Debug button clicked, updated the showing element to reflect input value
 	const showButton = () => {
-		setShow((prev) => value())
+		setShow(() => value())
 	}
 
 	// Actual decision table component I'll prolly use
