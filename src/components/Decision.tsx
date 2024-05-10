@@ -1,7 +1,35 @@
-import type { Component } from 'solid-js';
+import type { Component, JSX } from 'solid-js';
 import { createSignal } from 'solid-js';
 
-export const Decision: Component = () => {
+export type TOption = {
+	name: string;
+	values: number[]
+}
+
+export type TFactor = {
+	name: string;
+	weight: number;
+}
+
+export type TDecision = {
+	id: number;
+	title: string;
+	options: TOption[];
+	factors: TFactor[];
+}
+
+export const JumpListItem: Component<{
+	decision: TDecision,
+}> = (props) => {
+	return <li class="menu-list">
+		<a href={`#decision${props.decision.id}`}>{props.decision.title}</a>
+	</li>;
+};
+
+export const Decision: Component<{
+	decision: TDecision,
+	remover: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>,
+}> = (props) => {
 	// Below is a testing demonstration of using basic signals
 	let input: HTMLInputElement
 
@@ -19,15 +47,19 @@ export const Decision: Component = () => {
 		setShow(() => value())
 	}
 
+	const D = props.decision
+
 	// Actual decision table component I'll prolly use
-	return <div class="card has-background-black-ter">
+	return <div class="card has-background-black-ter" id={`decision${D.id}`}>
 		<div class="card-content">
 			<div class="level">
 				<div class="level-left">
-					<div class="level-item"><h3 class="subtitle">Decision 1</h3></div>
+					<div class="level-item"><h3 class="subtitle">{D.title}</h3></div>
 				</div>
 				<div class="level-right">
-					<div class="level-item"><button class="button is-small is-outlined is-danger">X</button></div>
+					<div class="level-item">
+						<button onClick={props.remover} class="button is-small is-outlined is-danger">X</button>
+					</div>
 				</div>
 			</div>
 			<table class="table has-background-black-ter">
