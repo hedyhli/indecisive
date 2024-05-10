@@ -5,24 +5,24 @@ import { createStore } from 'solid-js/store'
 
 
 export type TOption = {
-	name: string;
-	values: number[]
+  name: string;
+  values: number[]
 }
 
 export type TFactor = {
-	name: string;
-	weight: number;
+  name: string;
+  weight: number;
 }
 
 export type TDecision = {
-	id: number;
-	title: string;
-	options: TOption[];
-	factors: TFactor[];
+  id: number;
+  title: string;
+  options: TOption[];
+  factors: TFactor[];
 }
 
 export type DecisionStore = {
-	d: TDecision[];
+  d: TDecision[];
 }
 
 type NotUndefined<T> = Exclude<T, undefined>;

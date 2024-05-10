@@ -7,22 +7,22 @@ import { Jumplist } from './Jumplist'
 
 
 const App: Component = () => {
-	const [state, setState] = createLocalStore<DecisionStore>({d: []})
+  const [state, setState] = createLocalStore<DecisionStore>({d: []})
 
-	return (
-		<div class="columns is-gapless">
-			<div class="column is-one-fifth mr-6" style="border-right: 2px solid var(--bulma-grey-darker)">
-				<DContext.Provider value={{state, setState}}>
-					<Jumplist />
-				</DContext.Provider>
-			</div>
-			<main class="column">
-				<DContext.Provider value={{state, setState}}>
-					<Decisions />
-				</DContext.Provider>
-			</main>
-		</div>
-	);
+  return (
+    <div class="columns is-gapless">
+      <div class="column is-one-fifth mr-6" style="border-right: 2px solid var(--bulma-grey-darker)">
+        <DContext.Provider value={{state, setState}}>
+          <Jumplist />
+        </DContext.Provider>
+      </div>
+      <main class="column">
+        <DContext.Provider value={{state, setState}}>
+          <Decisions />
+        </DContext.Provider>
+      </main>
+    </div>
+    );
 };
 
 /* TODO
