@@ -14,7 +14,13 @@ export const Decisions: Component = () => {
       const id = d.length === 0 ? 0 : d[d.length-1].id + 1
       return [
         ...d,
-        {id, editingTitle: false, title: `Decision ${id}`, options: [], factors: []}
+        {
+          id,
+          editingTitle: false,
+          title: `Decision ${id}`,
+          options: [{ name: "SolidJS", values: [50] }],
+          factors: [{ name: "Hype", weight: 100 }],
+        }
       ]
     })
   }
@@ -93,29 +99,76 @@ const Title: Component<{decision: TDecision}> = (props) => {
   )
 }
 
+const TblHead: Component<{decision: TDecision}> = (props) => {
+  const D = props.decision;
+  return (
+    <tr>
+      <th></th>
+      <th>
+        <div class="level">
+          <div class="level-left"><span class="level-item">Options</span></div>
+          <div class="level-right">
+            <button class="button is-ghost is-info">+</button>
+          </div>
+        </div>
+      </th>
+      <For each={D.factors}>{(F, i) => (
+        <th>
+          <Show when={D.factors.length-1 == i()} fallback={
+            <span>{F.name}</span>
+          }>
+            <div class="level">
+              <div class="level-left"><span class="level-item">{F.name}</span></div>
+              <div class="level-right">
+                <button class="button is-ghost is-link">+</button>
+              </div>
+            </div>
+          </Show>
+        </th>
+      )}</For>
+    </tr>
+  );
+}
+
+const TblFoot: Component<{decision: TDecision}> = (props) => {
+  const D = props.decision;
+  return (
+    <tr>
+      <th></th>
+      <th class="has-text-right">Weights</th>
+      <For each={D.factors}>{(F) => (
+        <th><input class="input" size="20" type="number" value={F.weight}></input></th>
+      )}</For>
+    </tr>
+  );
+}
+
+const Table: Component<{decision: TDecision}> = (props) => {
+  const D = props.decision;
+  return (
+    <table class="table has-background-black-ter">
+      <thead><TblHead decision={props.decision} /></thead>
+      <tfoot><TblFoot decision={props.decision} /></tfoot>
+      <tbody>
+        <For each={D.options}>{(O) => (
+          <tr>
+            <td><button class="button is-small is-ghost is-danger">X</button></td>
+            <td><input class="input" size="20" type="text" value={O.name}></input></td>
+            <For each={O.values}>{(v) => (
+              <td><input class="input" size="20" type="number" value={v}></input></td>
+            )}</For>
+          </tr>
+        )}</For>
+      </tbody>
+    </table>
+  )
+}
+
 const Decision: Component<{decision: TDecision}> = (props) => {
   const {state, setState} = mustUseContext();
   const D = props.decision
 
   const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((decision) => decision.id !== id));
-
-
-  // Below is a testing demonstration of using basic signals
-  let input: HTMLInputElement
-
-  // Storing a specific input field value
-  const [value, setValue] = createSignal("Default name");
-  // Signal for the element that will debug (show) the input value
-  const [show, setShow] = createSignal("N/A");
-
-  // Input value changed, store it
-  const changed = () => {
-    setValue(() => input.value);
-  }
-  // Debug button clicked, updated the showing element to reflect input value
-  const showButton = () => {
-    setShow(() => value())
-  }
 
   // Actual decision table component I'll prolly use
   return <div class="card has-background-black-ter" id={`decision${D.id}`}>
@@ -123,7 +176,7 @@ const Decision: Component<{decision: TDecision}> = (props) => {
       <div class="level">
         <div class="level-left">
           <div class="level-item">
-            <Title decision={props.decision} />
+            <Title decision={D} />
           </div>
         </div>
         <div class="level-right">
@@ -132,47 +185,11 @@ const Decision: Component<{decision: TDecision}> = (props) => {
           </div>
         </div>
       </div>
-      <table class="table has-background-black-ter">
-        <thead>
-          <tr>
-          <th></th>
-            <th>
-              <div class="level">
-                <div class="level-left"><span class="level-item">Options</span></div>
-                <div class="level-right">
-                  <button class="button is-ghost is-info">+</button>
-                </div>
-              </div>
-            </th>
-            <th>
-              <div class="level">
-                <div class="level-left"><span class="level-item">Value 1</span></div>
-                <div class="level-right">
-                  <button class="button is-ghost is-link">+</button>
-                </div>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tfoot>
-          <tr>
-          <th></th>
-            <th class="has-text-right">Weights</th>
-            <th><input class="input" size="20" type="number"></input></th>
-          </tr>
-        </tfoot>
-        <tbody>
-          <tr>
-            <td><button class="button is-small is-ghost is-danger">X</button></td>
-            <td><input ref={input} value={value()} onChange={changed} class="input" size="20" type="text"></input></td>
-            <td><input class="input" size="20" type="number"></input></td>
-          </tr>
-        </tbody>
-      </table>
+      <Table decision={D} />
     </div>
     <div class="card-footer">
-      <span class="card-footer-item"><button class="button is-text" onClick={showButton}>Debug</button></span>
-      <span class="card-footer-item"><p>{show()}</p></span>
+      <span class="card-footer-item"><button class="button is-text">Debug</button></span>
+      <span class="card-footer-item"><p>Todo</p></span>
     </div>
-  </div>;
+  </div>
 };
