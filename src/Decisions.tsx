@@ -3,7 +3,7 @@ import type { Component } from 'solid-js';
 import { createSignal } from 'solid-js';
 import { For, Show } from 'solid-js/web'
 
-import type { TDecision } from './model'
+import type { TDecision, TOption } from './model'
 import { mustUseContext } from './model'
 
 export const Decisions: Component = () => {
@@ -99,8 +99,48 @@ const Title: Component<{decision: TDecision}> = (props) => {
   )
 }
 
+const FactorName: Component<{decision: TDecision, i: number}> = (props) => {
+  const {state, setState} = mustUseContext();
+  const rmFactor = () => {
+    let factors = [...props.decision.factors]
+    if (factors.length == 1) {
+      return
+    }
+    // Delete factor
+    factors.splice(props.i, 1)
+    setState("d", (dec) => dec.id == props.decision.id, {
+      factors: factors,
+      options: props.decision.options.map((opt: TOption) => {
+        // Delete value for each option
+        let values = [...opt.values]
+        values.splice(props.i, 1)
+        return { ...opt, values }
+      }
+    )})
+  }
+  return (
+    <div class="level">
+      <div class="level-left">
+        <span class="level-item">{props.decision.factors[props.i].name}</span>
+        <span class="level-item"><button class="button is-small is-ghost" onClick={rmFactor}>X</button></span>
+      </div>
+    </div>
+  )
+}
+
 const TblHead: Component<{decision: TDecision}> = (props) => {
+  const {state, setState} = mustUseContext();
   const D = props.decision;
+
+  const addFactor = () => {
+    setState("d", (dec) => dec.id == D.id, {
+      factors: [...D.factors, {name: `Factor ${D.factors.length+1}`, weight: 100}],
+      options: D.options.map((opt) => ({
+        ...opt, values: [...opt.values, 50]
+      }))
+    })
+  }
+
   return (
     <tr>
       <th></th>
@@ -115,12 +155,14 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
       <For each={D.factors}>{(F, i) => (
         <th>
           <Show when={D.factors.length-1 == i()} fallback={
-            <span>{F.name}</span>
+            <FactorName decision={D} i={i()} />
           }>
             <div class="level">
-              <div class="level-left"><span class="level-item">{F.name}</span></div>
+              <div class="level-left"><span class="level-item">
+                <FactorName decision={D} i={i()} />
+              </span></div>
               <div class="level-right">
-                <button class="button is-ghost is-link">+</button>
+                <button class="button is-ghost is-link" onClick={addFactor}>+</button>
               </div>
             </div>
           </Show>
