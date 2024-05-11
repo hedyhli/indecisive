@@ -1,14 +1,14 @@
 import type { Component } from 'solid-js';
 
-import { createSignal, useContext } from 'solid-js';
+import { createSignal } from 'solid-js';
 import { For, Show } from 'solid-js/web'
 
 import type { TDecision } from './model'
-import { DContext } from './model'
+import { DContext, mustUseContext } from './model'
 
 
 export const Decisions: Component = () => {
-  const {state, setState} = useContext(DContext);
+  const {state, setState} = mustUseContext()!;
 
   const addDecision = () => {
     setState("d", (d: TDecision[]) => {
@@ -40,7 +40,7 @@ export const Decisions: Component = () => {
 
 export const Decision: Component<{decision: TDecision}> = (props) => {
   const D = props.decision
-  const {state, setState} = useContext(DContext);
+  const {state, setState} = mustUseContext();
 
   const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((D) => D.id !== id))
 

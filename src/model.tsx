@@ -1,6 +1,5 @@
-import type { Context } from 'solid-js';
 import type { SetStoreFunction } from 'solid-js/store';
-import { createContext, createEffect } from 'solid-js'
+import { createContext, createEffect, useContext } from 'solid-js'
 import { createStore } from 'solid-js/store'
 
 
@@ -25,10 +24,15 @@ export type DecisionStore = {
   d: TDecision[];
 }
 
-type NotUndefined<T> = Exclude<T, undefined>;
-
-type storeTuple = [DecisionStore, SetStoreFunction<DecisionStore>];
-export const DContext: Context<NotUndefined<storeTuple>> = createContext<storeTuple>()
+type storeTuple = {state: DecisionStore, setState: SetStoreFunction<DecisionStore>};
+export const DContext = createContext<storeTuple>()!;
+export const mustUseContext = () => {
+  const ctx = useContext(DContext);
+  if (!ctx) {
+    throw new Error("DContext should be provided!");
+  }
+  return ctx as storeTuple
+}
 
 const LOCAL_STORAGE_KEY = "indecisive-solid";
 export function createLocalStore<T extends object>(value: T) {

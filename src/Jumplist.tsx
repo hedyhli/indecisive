@@ -1,9 +1,8 @@
 import type { Component } from 'solid-js'
-import { useContext } from 'solid-js'
 import { For, Show } from 'solid-js/web'
 
 import type { TDecision } from './model'
-import { DContext } from './model'
+import { mustUseContext } from './model'
 
 export const JumplistItem: Component<{
   decision: TDecision,
@@ -14,7 +13,7 @@ export const JumplistItem: Component<{
 };
 
 export const Jumplist: Component = () => {
-  const {state, setState} = useContext(DContext);
+  const {state, setState} = mustUseContext();
 
   return (
     <aside>

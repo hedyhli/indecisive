@@ -22,7 +22,7 @@ const App: Component = () => {
         </DContext.Provider>
       </main>
     </div>
-    );
+  );
 };
 
 /* TODO
