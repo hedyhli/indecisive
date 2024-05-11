@@ -4,18 +4,17 @@ import { createSignal } from 'solid-js';
 import { For, Show } from 'solid-js/web'
 
 import type { TDecision } from './model'
-import { DContext, mustUseContext } from './model'
-
+import { mustUseContext } from './model'
 
 export const Decisions: Component = () => {
-  const {state, setState} = mustUseContext()!;
+  const {state, setState} = mustUseContext();
 
   const addDecision = () => {
     setState("d", (d: TDecision[]) => {
       const id = d.length === 0 ? 0 : d[d.length-1].id + 1
       return [
         ...d,
-        {id, title: `Decision ${id}`, options: [], factors: []}
+        {id, editingTitle: false, title: `Decision ${id}`, options: [], factors: []}
       ]
     })
   }
@@ -38,11 +37,68 @@ export const Decisions: Component = () => {
   </div>
 }
 
-export const Decision: Component<{decision: TDecision}> = (props) => {
-  const D = props.decision
+const Title: Component<{decision: TDecision}> = (props) => {
   const {state, setState} = mustUseContext();
+  const D = props.decision;
 
-  const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((D) => D.id !== id))
+  const [newTitle, setNewTitle] = createSignal(D.title),
+  startEditTitle = () => setState(
+    "d",
+    (decision: TDecision) => props.decision.id === decision.id,
+    {editingTitle: true}
+  ),
+  editingTitle = (e: KeyboardEvent) => {
+    if (e.key == 'Escape') {
+      setNewTitle(D.title);
+      return cancelEditTitle();
+    }
+    setNewTitle((e.currentTarget as HTMLInputElement).value);
+    if (e.key == 'Enter') {
+      editedTitle();
+    }
+  },
+  editedTitle = () => setState(
+    "d",
+    (decision: TDecision) => props.decision.id === decision.id,
+    {title: newTitle(), editingTitle: false}
+  ),
+  cancelEditTitle = () => setState(
+    "d",
+    (decision: TDecision) => props.decision.id === decision.id,
+    {editingTitle: false}
+  );
+
+  return (
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <Show when={D.editingTitle} fallback={
+            <h3 class="subtitle">{D.title}</h3>
+          }>
+            <input class="input" value={D.title} onkeydown={editingTitle}></input>
+          </Show>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <Show when={D.editingTitle} fallback={
+            <button onClick={startEditTitle} class="button is-small is-outlined is-info">edit</button>
+          }>
+            <button class="button is-primary" onclick={editedTitle}>Save</button>
+            <button class="button is-danger is-text" onclick={cancelEditTitle}>Cancel</button>
+          </Show>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const Decision: Component<{decision: TDecision}> = (props) => {
+  const {state, setState} = mustUseContext();
+  const D = props.decision
+
+  const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((decision) => decision.id !== id));
+
 
   // Below is a testing demonstration of using basic signals
   let input: HTMLInputElement
@@ -50,7 +106,7 @@ export const Decision: Component<{decision: TDecision}> = (props) => {
   // Storing a specific input field value
   const [value, setValue] = createSignal("Default name");
   // Signal for the element that will debug (show) the input value
-  const [show, setShow] = createSignal("show");
+  const [show, setShow] = createSignal("N/A");
 
   // Input value changed, store it
   const changed = () => {
@@ -66,7 +122,9 @@ export const Decision: Component<{decision: TDecision}> = (props) => {
     <div class="card-content">
       <div class="level">
         <div class="level-left">
-          <div class="level-item"><h3 class="subtitle">{D.title}</h3></div>
+          <div class="level-item">
+            <Title decision={props.decision} />
+          </div>
         </div>
         <div class="level-right">
           <div class="level-item">

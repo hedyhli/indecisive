@@ -15,6 +15,7 @@ export type TFactor = {
 
 export type TDecision = {
   id: number;
+  editingTitle: boolean;
   title: string;
   options: TOption[];
   factors: TFactor[];
