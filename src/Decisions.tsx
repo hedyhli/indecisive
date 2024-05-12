@@ -138,6 +138,11 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
     })
   }
 
+  const addOption = () => setState(
+    "d", (dec) => dec.id == D.id, "options", D.options.length,
+    { name: "Another Option", values: [ ...D.options[0].values ] }
+  )
+
   return (
     <tr>
       <th></th>
@@ -145,11 +150,11 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
         <div class="level">
           <div class="level-left"><span class="level-item">Options</span></div>
           <div class="level-right">
-            <button class="button is-ghost is-info">+</button>
+            <button class="button is-ghost is-info" onClick={addOption}>+</button>
           </div>
         </div>
       </th>
-      <For each={D.factors}>{(F, i) => (
+      <For each={D.factors}>{(_, i) => (
         <th>
           <Show when={D.factors.length-1 == i()} fallback={
             <FactorName decision={D} i={i()} />
@@ -183,15 +188,23 @@ const TblFoot: Component<{decision: TDecision}> = (props) => {
 }
 
 const Table: Component<{decision: TDecision}> = (props) => {
+  const {state, setState} = mustUseContext();
   const D = props.decision;
+
+  const rmOption = (o: number) => {
+    let options = [...D.options]
+    options.splice(o, 1)
+    setState("d", (dec) => dec.id == D.id, "options", options)
+  }
+
   return (
     <table class="table has-background-black-ter">
       <thead><TblHead decision={props.decision} /></thead>
       <tfoot><TblFoot decision={props.decision} /></tfoot>
       <tbody>
-        <For each={D.options}>{(O) => (
+        <For each={D.options}>{(O, i) => (
           <tr>
-            <td><button class="button is-small is-ghost is-danger">X</button></td>
+            <td><button class="button is-small is-ghost is-danger" onClick={[rmOption, i()]}>X</button></td>
             <td><input class="input" size="20" type="text" value={O.name}></input></td>
             <For each={O.values}>{(v) => (
               <td><input class="input" size="20" type="number" value={v}></input></td>
