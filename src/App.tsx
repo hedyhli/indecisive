@@ -26,15 +26,16 @@ const App: Component = () => {
 };
 
 /* TODO
+ * ALL DONE FOR NOW
  *
  * Decision:
  * X Use solid-js/store for a single decision
- * On each input field change, update store
- * Buttons for adding rows/cols:
- *   Will update relevant arrays in store
+ * X On each input field change, update store
+ * X Buttons for adding rows/cols:
+ *   X Will update relevant arrays in store
  *
- * "Debug" button
- *   For now, use the `show` to display a list of rank calculations!
+ * ~~"Debug" button
+ *   X For now, use the `show` to display a list of rank calculations!
  *   So it's actually usable!
  *
  * App:
@@ -42,6 +43,9 @@ const App: Component = () => {
  * X "Add decision" will append to this array
  * X Possible need of sharing context for decisiosn between App and Decision
  * X Use the array of known decisions, and the context, to produce the jump list
+ *
+ * Edit option and factor names
+ * Better cleaner interface
  *
  * */
 
