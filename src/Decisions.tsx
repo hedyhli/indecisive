@@ -12,21 +12,46 @@ export const Decisions: Component = () => {
   const {state, setState} = mustUseContext();
 
   const addDecision = () => {
-    setState("d", state.d.length, () => {
-      const id = state.d.length === 0 ? 0 : state.d[state.d.length-1].id + 1
-      return {
-        id,
+    // Insert at the top
+    setState("d", () => {
+      // Opt to use gaps in id in existing decisions, fallback to length
+      const unused_ids: boolean[] = Array(state.d.length+1).fill(true);
+      for (var i = 0; i < state.d.length; i++) {
+        unused_ids[state.d[i].id] = false;
+      }
+      return [
+      {
+        id: unused_ids.findIndex((v) => v), // Should not be -1
         editingTitle: false,
-        title: `Decision ${id}`,
+        title: `What needs to be decided?`,
         options: [{ name: "SolidJS", values: [50] }],
         factors: [{ name: "Hype", weight: 100 }],
-      }
+      }, ...state.d]
     })
   }
 
   return <div>
     <div class="block">
-      <h3 class="title is-3">Decisions</h3>
+      <div class="level is-mobile">
+        <div class="level-left">
+          <div class="level-item"><h3 class="title is-3">Decisions</h3></div>
+        </div>
+        <div class="level-left">
+          <div class="level-item">
+            <button class="button is-primary is-outlined" onclick={addDecision}>
+              <span class="is-hidden-mobile">
+                <span class="icon-text">
+                  <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                  <span>Add Decision</span>
+                </span>
+              </span>
+              <span class="is-hidden-tablet">
+                <span class="icon is-hidden-tablet"><i class="fa-solid fa-plus"></i></span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="block">
       <Show when={state.d.length > 0} fallback={<p>Hooray, no decisions to make!!!</p>}>
@@ -34,15 +59,6 @@ export const Decisions: Component = () => {
           <Decision decision={D} i={i()} />
         )}</For>
       </Show>
-    </div>
-    <br />
-    <div class="block">
-      <button class="button is-primary is-outlined" onclick={addDecision}>
-        <span class="icon-text">
-          <span class="icon"><i class="fa-solid fa-plus"></i></span>
-          <span>Add Decision</span>
-        </span>
-      </button>
     </div>
   </div>
 }
@@ -65,9 +81,10 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
   editedTitle = () => setState("d", props.i, {title: newTitle(), editingTitle: false}),
   cancelEditTitle = () => setState("d", props.i, {editingTitle: false});
 
-  return (
-    <div class="level">
-      <div class="level-left">
+  return (<>
+    <code style="margin-left: -1rem; margin-right: 1rem;">{props.decision.id}</code>
+    <div class="level is-mobile">
+      <div class="level-left has-text-left">
         <div class="level-item">
           <Show when={props.decision.editingTitle} fallback={
             <h3 class="subtitle">{props.decision.title}</h3>
@@ -91,7 +108,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
         </div>
       </div>
     </div>
-  )
+  </>)
 }
 
 const FactorName: Component<{decision: TDecision, f: number}> = (props) => {
@@ -148,7 +165,7 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
         <th></th>
       </Show>
       <th>
-        <div class="level">
+        <div class="level is-mobile">
           <div class="level-left"><span class="level-item">Options</span></div>
           <div class="level-right">
             <button class="button is-ghost is-info" onClick={addOption}>
@@ -159,7 +176,7 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
       </th>
       <For each={props.decision.factors}>{(_, f) => (
         <th>
-          <div class="level">
+          <div class="level is-mobile">
             <div class="level-left">
               <FactorName decision={props.decision} f={f()} />
             </div>
@@ -265,7 +282,7 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
   // Actual decision table component I'll prolly use
   return <div class="card has-background-black-ter" id={`decision${props.decision.id}`}>
     <div class="card-content">
-      <div class="level">
+      <div class="level is-hidden-mobile">
         <div class="level-left">
           <div class="level-item">
             <Title decision={props.decision} i={props.i} />
@@ -285,7 +302,20 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
           </div>
         </div>
       </div>
+      <div class="block is-hidden-tablet">
+        <Title decision={props.decision} i={props.i} />
+      </div>
       <Table decision={props.decision} i={props.i} />
+      <div class="block is-hidden-tablet">
+        <div class="level is-mobile is-justify-content-flex-end">
+          <button class="button is-link is-outlined is-small" onClick={toggleGear}>
+            Toggle manage table
+          </button>
+          <button onClick={() => rmDecision(props.decision.id)} class="button is-small is-outlined is-danger">
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
     <div class="card-footer">
       <span class="card-footer-item"><p>{getRank()}</p></span>
