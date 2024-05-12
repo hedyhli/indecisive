@@ -6,6 +6,8 @@ import { For, Show } from 'solid-js/web'
 import type { TDecision, TOption } from './model'
 import { mustUseContext } from './model'
 
+import './assets/fontawesome/css/all.min.css'
+
 export const Decisions: Component = () => {
   const {state, setState} = mustUseContext();
 
@@ -35,7 +37,12 @@ export const Decisions: Component = () => {
     </div>
     <br />
     <div class="block">
-      <button class="button is-primary is-outlined" onclick={addDecision}>+ Add Decision</button>
+      <button class="button is-primary is-outlined" onclick={addDecision}>
+        <span class="icon-text">
+          <span class="icon"><i class="fa-solid fa-plus"></i></span>
+          <span>Add Decision</span>
+        </span>
+      </button>
     </div>
   </div>
 }
@@ -73,9 +80,13 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
       <div class="level-right">
         <div class="level-item">
           <Show when={D.editingTitle} fallback={
-            <button onClick={startEditTitle} class="button is-small is-outlined is-info">edit</button>
+            <button onClick={startEditTitle} class="button is-small is-outlined is-primary">
+              <span class="icon"><i class="fa-solid fa-pencil"></i></span>
+            </button>
           }>
-            <button class="button is-primary" onclick={editedTitle}>Save</button>
+            <button class="button is-primary is-small" onclick={editedTitle}>
+              <span class="icon"><i class="fa-solid fa-check"></i></span>
+            </button>
             <button class="button is-danger is-text" onclick={cancelEditTitle}>Cancel</button>
           </Show>
         </div>
@@ -107,7 +118,9 @@ const FactorName: Component<{decision: TDecision, f: number}> = (props) => {
     <div class="level">
       <div class="level-left">
         <span class="level-item">{props.decision.factors[props.f].name}</span>
-        <span class="level-item"><button class="button is-small has-text-danger is-ghost" onClick={rmFactor}>X</button></span>
+        <span class="level-item"><button class="button is-small has-text-danger is-ghost" onClick={rmFactor}>
+          <span class="icon"><i class="fa-solid fa-x" aria-hidden="true"></i></span>
+        </button></span>
       </div>
     </div>
   )
@@ -138,7 +151,9 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
         <div class="level">
           <div class="level-left"><span class="level-item">Options</span></div>
           <div class="level-right">
-            <button class="button is-ghost is-info" onClick={addOption}>+</button>
+            <button class="button is-ghost is-info" onClick={addOption}>
+              <span class="icon"><i class="fa-solid fa-plus"></i></span>
+            </button>
           </div>
         </div>
       </th>
@@ -152,7 +167,9 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
                 <FactorName decision={D} f={f()} />
               </span></div>
               <div class="level-right">
-                <button class="button is-ghost is-link" onClick={addFactor}>+</button>
+                <button class="button is-ghost is-link" onClick={addFactor}>
+                  <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                </button>
               </div>
             </div>
           </Show>
@@ -205,7 +222,9 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
       <tbody>
         <For each={D.options}>{(O, i) => (
           <tr>
-            <td><button class="button is-small is-ghost is-danger" onClick={[rmOption, i()]}>X</button></td>
+            <td><button class="button is-small is-ghost is-danger" onClick={[rmOption, i()]}>
+              <span class="icon"><i class="fa-solid fa-x" aria-hidden="true"></i></span>
+            </button></td>
             <td><input class="input" size="20" type="text" value={O.name} onChange={[changedOption, i()]}></input></td>
             <For each={O.values}>{(val, v) => (
               <td><input class="input" size="20" type="number" value={val} onChange={[changedValue, {o: i(), v: v()}]}></input></td>
@@ -244,7 +263,9 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
         </div>
         <div class="level-right">
           <div class="level-item">
-            <button onClick={() => rmDecision(D.id)} class="button is-small is-outlined is-danger">X</button>
+            <button onClick={() => rmDecision(D.id)} class="button is-small is-outlined is-danger">
+              <span class="icon"><i class="fa-solid fa-x" aria-hidden="true"></i></span>
+            </button>
           </div>
         </div>
       </div>
