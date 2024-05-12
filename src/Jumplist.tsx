@@ -4,9 +4,7 @@ import { For, Show } from 'solid-js/web'
 import type { TDecision } from './model'
 import { mustUseContext } from './model'
 
-export const JumplistItem: Component<{
-  decision: TDecision,
-}> = (props) => {
+export const JumplistItem: Component<{decision: TDecision}> = (props) => {
   return <li class="menu-list">
     <a href={`#decision${props.decision.id}`}>{props.decision.title}</a>
   </li>;

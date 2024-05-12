@@ -28,8 +28,8 @@ export const Decisions: Component = () => {
     </div>
     <div class="block">
       <Show when={state.d.length > 0} fallback={<p>Hooray, no decisions to make!!!</p>}>
-        <For each={state.d}>{(D) => (
-          <Decision decision={D} />
+        <For each={state.d}>{(D, i) => (
+          <Decision decision={D} i={i()} />
         )}</For>
       </Show>
     </div>
@@ -40,16 +40,12 @@ export const Decisions: Component = () => {
   </div>
 }
 
-const Title: Component<{decision: TDecision}> = (props) => {
+const Title: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const D = props.decision;
 
   const [newTitle, setNewTitle] = createSignal(D.title),
-  startEditTitle = () => setState(
-    "d",
-    (decision: TDecision) => props.decision.id === decision.id,
-    {editingTitle: true}
-  ),
+  startEditTitle = () => setState("d", props.i, {editingTitle: true}),
   editingTitle = (e: KeyboardEvent) => {
     if (e.key == 'Escape') {
       setNewTitle(D.title);
@@ -60,16 +56,8 @@ const Title: Component<{decision: TDecision}> = (props) => {
       editedTitle();
     }
   },
-  editedTitle = () => setState(
-    "d",
-    (decision: TDecision) => props.decision.id === decision.id,
-    {title: newTitle(), editingTitle: false}
-  ),
-  cancelEditTitle = () => setState(
-    "d",
-    (decision: TDecision) => props.decision.id === decision.id,
-    {editingTitle: false}
-  );
+  editedTitle = () => setState("d", props.i, {title: newTitle(), editingTitle: false}),
+  cancelEditTitle = () => setState("d", props.i, {editingTitle: false});
 
   return (
     <div class="level">
@@ -96,7 +84,7 @@ const Title: Component<{decision: TDecision}> = (props) => {
   )
 }
 
-const FactorName: Component<{decision: TDecision, i: number}> = (props) => {
+const FactorName: Component<{decision: TDecision, f: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const rmFactor = () => {
     let factors = [...props.decision.factors]
@@ -104,13 +92,13 @@ const FactorName: Component<{decision: TDecision, i: number}> = (props) => {
       return
     }
     // Delete factor
-    factors.splice(props.i, 1)
-    setState("d", (dec) => dec.id == props.decision.id, {
+    factors.splice(props.f, 1)
+    setState("d", props.f, {
       factors: factors,
       options: props.decision.options.map((opt: TOption) => {
         // Delete value for each option
         let values = [...opt.values]
-        values.splice(props.i, 1)
+        values.splice(props.f, 1)
         return { ...opt, values }
       }
     )})
@@ -118,19 +106,19 @@ const FactorName: Component<{decision: TDecision, i: number}> = (props) => {
   return (
     <div class="level">
       <div class="level-left">
-        <span class="level-item">{props.decision.factors[props.i].name}</span>
+        <span class="level-item">{props.decision.factors[props.f].name}</span>
         <span class="level-item"><button class="button is-small has-text-danger is-ghost" onClick={rmFactor}>X</button></span>
       </div>
     </div>
   )
 }
 
-const TblHead: Component<{decision: TDecision}> = (props) => {
+const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const D = props.decision;
 
   const addFactor = () => {
-    setState("d", (dec) => dec.id == D.id, {
+    setState("d", props.i, {
       factors: [...D.factors, {name: `Factor ${D.factors.length+1}`, weight: 100}],
       options: D.options.map((opt) => ({
         ...opt, values: [...opt.values, 50]
@@ -139,7 +127,7 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
   }
 
   const addOption = () => setState(
-    "d", (dec) => dec.id == D.id, "options", D.options.length,
+    "d", props.i, "options", D.options.length,
     { name: "Another Option", values: [ ...D.options[0].values ] }
   )
 
@@ -154,14 +142,14 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
           </div>
         </div>
       </th>
-      <For each={D.factors}>{(_, i) => (
+      <For each={D.factors}>{(_, f) => (
         <th>
-          <Show when={D.factors.length-1 == i()} fallback={
-            <FactorName decision={D} i={i()} />
+          <Show when={D.factors.length-1 == f()} fallback={
+            <FactorName decision={D} f={f()} />
           }>
             <div class="level">
               <div class="level-left"><span class="level-item">
-                <FactorName decision={D} i={i()} />
+                <FactorName decision={D} f={f()} />
               </span></div>
               <div class="level-right">
                 <button class="button is-ghost is-link" onClick={addFactor}>+</button>
@@ -174,10 +162,10 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
   );
 }
 
-const TblFoot: Component<{decision: TDecision}> = (props) => {
+const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const changedWeight = (w: number, e: Event) => setState(
-    "d", (dec) => dec.id == props.decision.id, "factors", w, "weight",
+    "d", props.i, "factors", w, "weight",
     parseFloat((e.target as HTMLInputElement).value.trim())
   )
   return (
@@ -191,29 +179,29 @@ const TblFoot: Component<{decision: TDecision}> = (props) => {
   );
 }
 
-const Table: Component<{decision: TDecision}> = (props) => {
+const Table: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const D = props.decision;
 
   const rmOption = (o: number) => {
     let options = [...D.options]
     options.splice(o, 1)
-    setState("d", (dec) => dec.id == D.id, "options", options)
+    setState("d", props.i, "options", options)
   }
   const changedOption = (o: number, e: Event) => {
-    setState("d", (dec) => dec.id == D.id, "options", o, { name: (e.target as HTMLInputElement).value })
+    setState("d", props.i, "options", o, { name: (e.target as HTMLInputElement).value })
   }
   const changedValue = ({ o, v }: {o: number, v: number}, e: Event) => {
     setState(
-      "d", (dec) => dec.id == D.id, "options", o, "values", v,
+      "d", props.i, "options", o, "values", v,
       parseFloat((e.target as HTMLInputElement).value.trim())
     )
   }
 
   return (
     <table class="table has-background-black-ter">
-      <thead><TblHead decision={props.decision} /></thead>
-      <tfoot><TblFoot decision={props.decision} /></tfoot>
+      <thead><TblHead decision={props.decision} i={props.i} /></thead>
+      <tfoot><TblFoot decision={props.decision} i={props.i} /></tfoot>
       <tbody>
         <For each={D.options}>{(O, i) => (
           <tr>
@@ -229,7 +217,7 @@ const Table: Component<{decision: TDecision}> = (props) => {
   )
 }
 
-const Decision: Component<{decision: TDecision}> = (props) => {
+const Decision: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const D = props.decision
 
@@ -251,7 +239,7 @@ const Decision: Component<{decision: TDecision}> = (props) => {
       <div class="level">
         <div class="level-left">
           <div class="level-item">
-            <Title decision={D} />
+            <Title decision={D} i={props.i} />
           </div>
         </div>
         <div class="level-right">
@@ -260,7 +248,7 @@ const Decision: Component<{decision: TDecision}> = (props) => {
           </div>
         </div>
       </div>
-      <Table decision={D} />
+      <Table decision={D} i={props.i} />
     </div>
     <div class="card-footer">
       <span class="card-footer-item"><p>{getRank()}</p></span>
