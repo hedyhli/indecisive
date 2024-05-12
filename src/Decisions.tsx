@@ -1,6 +1,6 @@
 import type { Component } from 'solid-js';
 
-import { createSignal } from 'solid-js';
+import { createSignal, createMemo } from 'solid-js';
 import { For, Show } from 'solid-js/web'
 
 import type { TDecision, TOption } from './model'
@@ -175,13 +175,17 @@ const TblHead: Component<{decision: TDecision}> = (props) => {
 }
 
 const TblFoot: Component<{decision: TDecision}> = (props) => {
-  const D = props.decision;
+  const {state, setState} = mustUseContext();
+  const changedWeight = (w: number, e: Event) => setState(
+    "d", (dec) => dec.id == props.decision.id, "factors", w, "weight",
+    parseFloat((e.target as HTMLInputElement).value.trim())
+  )
   return (
     <tr>
       <th></th>
       <th class="has-text-right">Weights</th>
-      <For each={D.factors}>{(F) => (
-        <th><input class="input" size="20" type="number" value={F.weight}></input></th>
+      <For each={props.decision.factors}>{(F, i) => (
+        <th><input class="input" size="20" type="number" value={F.weight} onChange={[changedWeight, i()]}></input></th>
       )}</For>
     </tr>
   );
@@ -196,6 +200,15 @@ const Table: Component<{decision: TDecision}> = (props) => {
     options.splice(o, 1)
     setState("d", (dec) => dec.id == D.id, "options", options)
   }
+  const changedOption = (o: number, e: Event) => {
+    setState("d", (dec) => dec.id == D.id, "options", o, { name: (e.target as HTMLInputElement).value })
+  }
+  const changedValue = ({ o, v }: {o: number, v: number}, e: Event) => {
+    setState(
+      "d", (dec) => dec.id == D.id, "options", o, "values", v,
+      parseFloat((e.target as HTMLInputElement).value.trim())
+    )
+  }
 
   return (
     <table class="table has-background-black-ter">
@@ -205,9 +218,9 @@ const Table: Component<{decision: TDecision}> = (props) => {
         <For each={D.options}>{(O, i) => (
           <tr>
             <td><button class="button is-small is-ghost is-danger" onClick={[rmOption, i()]}>X</button></td>
-            <td><input class="input" size="20" type="text" value={O.name}></input></td>
-            <For each={O.values}>{(v) => (
-              <td><input class="input" size="20" type="number" value={v}></input></td>
+            <td><input class="input" size="20" type="text" value={O.name} onChange={[changedOption, i()]}></input></td>
+            <For each={O.values}>{(val, v) => (
+              <td><input class="input" size="20" type="number" value={val} onChange={[changedValue, {o: i(), v: v()}]}></input></td>
             )}</For>
           </tr>
         )}</For>
@@ -221,6 +234,16 @@ const Decision: Component<{decision: TDecision}> = (props) => {
   const D = props.decision
 
   const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((decision) => decision.id !== id));
+  const getRank = createMemo(() => {
+    const decision = state.d.find((dec) => dec.id == props.decision.id)!
+    let evals = decision.options.map((opt) => [
+      opt.values.reduce((prev, val, v) => prev + val * decision.factors[v].weight, 0),
+      opt.name
+    ])
+    evals = evals.sort((e1, e2) => e2[0] - e1[0])
+    console.log(evals)
+    return evals.map((ev) => `${ev[1]} (${ev[0]})`).join(", ")
+  })
 
   // Actual decision table component I'll prolly use
   return <div class="card has-background-black-ter" id={`decision${D.id}`}>
@@ -240,8 +263,7 @@ const Decision: Component<{decision: TDecision}> = (props) => {
       <Table decision={D} />
     </div>
     <div class="card-footer">
-      <span class="card-footer-item"><button class="button is-text">Debug</button></span>
-      <span class="card-footer-item"><p>Todo</p></span>
+      <span class="card-footer-item"><p>{getRank()}</p></span>
     </div>
   </div>
 };
