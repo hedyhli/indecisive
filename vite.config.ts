@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
+import { viteSingleFile } from "vite-plugin-singlefile"
 // import devtools from 'solid-devtools/vite';
 
 export default defineConfig({
@@ -10,6 +11,10 @@ export default defineConfig({
     */
     // devtools(),
     solidPlugin(),
+    viteSingleFile({
+      // Only inline CSS into the single index.html.
+      inlinePattern: ["*.css"],
+    }),
   ],
   server: {
     port: 3000,
