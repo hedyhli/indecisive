@@ -19,6 +19,7 @@ export type TDecision = {
   title: string;
   options: TOption[];
   factors: TFactor[];
+  gearing: boolean;
 }
 
 export type DecisionStore = {

@@ -9,7 +9,7 @@ import { Jumplist } from './Jumplist'
 
 const App: Component = () => {
   const [state, setState] = createLocalStore<DecisionStore>({d: []})
-  setState("d", () => true, { editingTitle: false })
+  setState("d", () => true, { editingTitle: false, gearing: false })
 
   return (
     <DContext.Provider value={{state, setState}}>
