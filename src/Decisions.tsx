@@ -10,18 +10,15 @@ export const Decisions: Component = () => {
   const {state, setState} = mustUseContext();
 
   const addDecision = () => {
-    setState("d", (d: TDecision[]) => {
-      const id = d.length === 0 ? 0 : d[d.length-1].id + 1
-      return [
-        ...d,
-        {
-          id,
-          editingTitle: false,
-          title: `Decision ${id}`,
-          options: [{ name: "SolidJS", values: [50] }],
-          factors: [{ name: "Hype", weight: 100 }],
-        }
-      ]
+    setState("d", state.d.length, () => {
+      const id = state.d.length === 0 ? 0 : state.d[state.d.length-1].id + 1
+      return {
+        id,
+        editingTitle: false,
+        title: `Decision ${id}`,
+        options: [{ name: "SolidJS", values: [50] }],
+        factors: [{ name: "Hype", weight: 100 }],
+      }
     })
   }
 
@@ -122,7 +119,7 @@ const FactorName: Component<{decision: TDecision, i: number}> = (props) => {
     <div class="level">
       <div class="level-left">
         <span class="level-item">{props.decision.factors[props.i].name}</span>
-        <span class="level-item"><button class="button is-small is-ghost" onClick={rmFactor}>X</button></span>
+        <span class="level-item"><button class="button is-small has-text-danger is-ghost" onClick={rmFactor}>X</button></span>
       </div>
     </div>
   )
