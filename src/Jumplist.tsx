@@ -1,28 +1,33 @@
 import type { Component } from 'solid-js'
-import { For, Show } from 'solid-js/web'
+import { For } from 'solid-js/web'
 
 import type { TDecision } from './model'
 import { mustUseContext } from './model'
 
 export const JumplistItem: Component<{decision: TDecision}> = (props) => {
-  return <li class="menu-list">
-    <a href={`#decision${props.decision.id}`}>{props.decision.title}</a>
-  </li>;
+  return (
+    <a class="dropdown-item" href={`#decision${props.decision.id}`}>{props.decision.title}</a>
+  )
 };
 
 export const Jumplist: Component = () => {
   const {state, setState} = mustUseContext();
 
   return (
-    <aside>
-      <h4 class="title is-5">Jump list</h4>
-      <Show when={state.d.length > 0} fallback={<p>No decisions yet.</p>}>
-        <ul class="menu">
-          <For each={state.d}>{(D: TDecision) => (
+    <div class="dropdown is-hoverable is-up is-right"
+      style="position: fixed; bottom: 1rem; right: 1rem; z-index: 1000;">
+      <div class="dropdown-trigger">
+        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+          Jump to Decision
+        </button>
+      </div>
+      <div class="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <For each={state.d}>{(D) => (
             <JumplistItem decision={D}/>
           )}</For>
-        </ul>
-      </Show>
-    </aside>
+        </div>
+      </div>
+    </div>
   )
 }

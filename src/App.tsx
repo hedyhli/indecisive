@@ -1,4 +1,5 @@
 import type { Component } from 'solid-js';
+import { Show } from 'solid-js/web';
 
 import type { DecisionStore } from './model'
 import { DContext, createLocalStore } from './model'
@@ -12,15 +13,12 @@ const App: Component = () => {
 
   return (
     <DContext.Provider value={{state, setState}}>
-      <div class="columns is-gapless">
-        <div class="column is-one-fifth mr-6"
-             style="border-right: 2px solid var(--bulma-grey-darker)">
+      <main>
+        <Show when={state.d.length > 1}>
           <Jumplist />
-        </div>
-        <main class="column">
-          <Decisions />
-        </main>
-      </div>
+        </Show>
+        <Decisions />
+      </main>
     </DContext.Provider>
   );
 };
