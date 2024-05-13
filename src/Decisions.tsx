@@ -226,7 +226,7 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
           <Show when={!props.decision.gearing}
                 fallback=<span style="font-weight:normal;">{F.weight}</span>
           >
-            <input class="input" size="20" type="number" value={F.weight}
+            <input class="input is-static" type="number" value={F.weight}
               onChange={[changedWeight, i()]}></input>
           </Show>
         </th>
@@ -253,8 +253,8 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
     )
   }
 
-  return (
-    <table class="table has-background-black-ter">
+  return (<div class="table-container">
+    <table class="table is-fullwidth has-background-black-ter">
       <thead><TblHead decision={props.decision} i={props.i} /></thead>
       <tfoot><TblFoot decision={props.decision} i={props.i} /></tfoot>
       <tbody>
@@ -270,14 +270,14 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
             </Show>
             <td>
               <Show when={props.decision.gearing} fallback={O.name}>
-                <input class="input" size="20" type="text" value={O.name}
+                <input class="input" type="text" value={O.name}
                   onChange={[changedOption, i()]}></input>
               </Show>
             </td>
             <For each={O.values}>{(val, v) => (
               <td>
                 <Show when={!props.decision.gearing} fallback={val}>
-                  <input class="input" type="number" value={val}
+                  <input class="input is-static" type="number" value={val}
                     onChange={[changedValue, {o: i(), v: v()}]}></input>
                 </Show>
               </td>
@@ -286,13 +286,24 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
         )}</For>
       </tbody>
     </table>
-  )
+  </div>)
 }
 
 const Decision: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
 
-  const rmDecision = (id: number) => setState("d", (d: TDecision[]) => d.filter((decision) => decision.id !== id));
+  let rmConfirm!: HTMLDivElement;
+  const rmDecision = () => {
+    rmConfirm.classList.add("is-active");
+  }
+  const cancelRmDecision = () => {
+    rmConfirm.classList.remove("is-active");
+  }
+  const actualRmDecision = () => setState(
+    "d",
+    (d: TDecision[]) => d.filter((decision) => decision.id !== props.decision.id)
+  );
+
   const getRank = createMemo(() => {
     const decision = state.d[props.i]
     let evals: [number, string][] = decision.options.map((opt) => [
@@ -321,7 +332,7 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
             </button>
           </div>
           <div class="level-item">
-            <button onClick={() => rmDecision(props.decision.id)}
+            <button onClick={rmDecision}
               class="button is-medium is-ghost has-text-danger" style="text-decoration: none">
               <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
             </button>
@@ -337,11 +348,26 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
           <button class="button is-link is-outlined is-small" onClick={toggleGear}>
             Toggle manage table
           </button>
-          <button onClick={() => rmDecision(props.decision.id)} class="button is-small is-outlined is-danger">
+          <button onClick={rmDecision} class="button is-small is-outlined is-danger">
             Delete
           </button>
         </div>
       </div>
+    </div>
+    <div class="modal" ref={rmConfirm}>
+      <div class="modal-background"></div>
+      <div class="modal-content">
+        <div class="card">
+          <div class="card-content has-text-centered">
+            <p>Are you sure?</p>
+          </div>
+          <div class="card-footer">
+            <button onclick={cancelRmDecision} class="button is-text card-footer-item">Cancel</button>
+            <button onclick={actualRmDecision} class="button is-danger card-footer-item">Delete</button>
+          </div>
+        </div>
+      </div>
+      <button onclick={cancelRmDecision} class="modal-close is-large" aria-label="close"></button>
     </div>
     <div class="card-footer">
       <span class="card-footer-item"><p>{getRank()}</p></span>
