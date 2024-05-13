@@ -1,7 +1,7 @@
 import type { Component } from 'solid-js';
 
 import { createSignal, createMemo } from 'solid-js';
-import { For, Show } from 'solid-js/web'
+import { For, Show, Switch, Match } from 'solid-js/web'
 
 import type { TDecision, TOption } from './model'
 import { mustUseContext } from './model'
@@ -111,7 +111,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
   </>)
 }
 
-const FactorName: Component<{decision: TDecision, f: number}> = (props) => {
+const FactorName: Component<{decision: TDecision, i: number, f: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const rmFactor = () => {
     let factors = [...props.decision.factors]
@@ -130,20 +130,6 @@ const FactorName: Component<{decision: TDecision, f: number}> = (props) => {
       }
     )})
   }
-  return <>
-    <div class="level-item">{props.decision.factors[props.f].name}</div>
-    <Show when={props.decision.gearing}>
-      <div class="level-item">
-        <button class="button is-small has-text-danger is-ghost" onClick={rmFactor}>
-          <span class="icon"><i class="fa-solid fa-x" aria-hidden="true"></i></span>
-        </button>
-      </div>
-    </Show>
-  </>
-}
-
-const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
-  const {state, setState} = mustUseContext();
 
   const addFactor = () => {
     setState("d", props.i, {
@@ -153,6 +139,40 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
       }))
     })
   }
+
+  return (
+    <div class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">{props.decision.factors[props.f].name}</div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <Switch>
+            <Match when={props.decision.gearing}>
+              <button class="button has-text-danger is-ghost" onClick={rmFactor}
+                style="text-decoration: none">
+                <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
+              </button>
+            </Match>
+            <Match when={!props.decision.gearing && props.decision.factors.length-1 == props.f}>
+              <button class="button is-ghost is-link" onClick={addFactor}>
+                <span class="icon"><i class="fa-solid fa-plus"></i></span>
+              </button>
+            </Match>
+            <Match when={!props.decision.gearing}>
+              <button class="button is-ghost">
+                <span class="icon"></span>
+              </button>
+            </Match>
+          </Switch>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
+  const {state, setState} = mustUseContext();
 
   const addOption = () => setState(
     "d", props.i, "options", props.decision.options.length,
@@ -167,33 +187,22 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
       <th>
         <div class="level is-mobile">
           <div class="level-left"><span class="level-item">Options</span></div>
-          <div class="level-right">
-            <button class="button is-ghost is-info" onClick={addOption}>
-              <span class="icon"><i class="fa-solid fa-plus"></i></span>
-            </button>
-          </div>
+            <div class="level-right">
+            <Show when={!props.decision.gearing} fallback={
+              <button class="button is-ghost">
+                <span class="icon"></span>
+              </button>
+            }>
+              <button class="button is-ghost is-info" onClick={addOption}>
+                <span class="icon"><i class="fa-solid fa-plus"></i></span>
+              </button>
+            </Show>
+            </div>
         </div>
       </th>
       <For each={props.decision.factors}>{(_, f) => (
         <th>
-          <div class="level is-mobile">
-            <div class="level-left">
-              <FactorName decision={props.decision} f={f()} />
-            </div>
-              <div class="level-right">
-                <div class="level-item">
-                <Show when={props.decision.factors.length-1 == f()} fallback={
-                  <button class="button is-ghost">
-                    <span class="icon"></span>
-                  </button>
-                }>
-                  <button class="button is-ghost is-link" onClick={addFactor}>
-                    <span class="icon"><i class="fa-solid fa-plus"></i></span>
-                  </button>
-                </Show>
-                </div>
-              </div>
-          </div>
+          <FactorName decision={props.decision} i={props.i} f={f()} />
         </th>
       )}</For>
     </tr>
@@ -213,7 +222,14 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
       </Show>
       <th class="has-text-right">Weights</th>
       <For each={props.decision.factors}>{(F, i) => (
-        <th><input class="input" size="20" type="number" value={F.weight} onChange={[changedWeight, i()]}></input></th>
+        <th>
+          <Show when={!props.decision.gearing}
+                fallback=<span style="font-weight:normal;">{F.weight}</span>
+          >
+            <input class="input" size="20" type="number" value={F.weight}
+              onChange={[changedWeight, i()]}></input>
+          </Show>
+        </th>
       )}</For>
     </tr>
   );
@@ -246,15 +262,25 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
           <tr>
             <Show when={props.decision.gearing}>
               <td>
-                <button class="button is-small is-text has-text-danger"
+                <button class="button is-text has-text-danger"
                   style="text-decoration: none" onClick={[rmOption, i()]}>
-                  <span class="icon"><i class="fa-solid fa-x" aria-hidden="true"></i></span>
+                  <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
                 </button>
               </td>
             </Show>
-            <td><input class="input" size="20" type="text" value={O.name} onChange={[changedOption, i()]}></input></td>
+            <td>
+              <Show when={props.decision.gearing} fallback={O.name}>
+                <input class="input" size="20" type="text" value={O.name}
+                  onChange={[changedOption, i()]}></input>
+              </Show>
+            </td>
             <For each={O.values}>{(val, v) => (
-              <td><input class="input" size="20" type="number" value={val} onChange={[changedValue, {o: i(), v: v()}]}></input></td>
+              <td>
+                <Show when={!props.decision.gearing} fallback={val}>
+                  <input class="input" type="number" value={val}
+                    onChange={[changedValue, {o: i(), v: v()}]}></input>
+                </Show>
+              </td>
             )}</For>
           </tr>
         )}</For>
@@ -274,7 +300,6 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
       opt.name
     ])
     evals = evals.sort((e1, e2) => e2[0] - e1[0])
-    console.log(evals)
     return evals.map((ev) => `${ev[1]} (${ev[0]})`).join(", ")
   })
   const toggleGear = () => setState("d", props.i, { gearing: !state.d[props.i].gearing })
@@ -296,8 +321,9 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
             </button>
           </div>
           <div class="level-item">
-            <button onClick={() => rmDecision(props.decision.id)} class="button is-small is-outlined is-danger">
-              <span class="icon"><i class="fa-solid fa-x" aria-hidden="true"></i></span>
+            <button onClick={() => rmDecision(props.decision.id)}
+              class="button is-medium is-ghost has-text-danger" style="text-decoration: none">
+              <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
             </button>
           </div>
         </div>
