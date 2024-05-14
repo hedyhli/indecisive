@@ -5,6 +5,7 @@ import { For, Show, Switch, Match } from 'solid-js/web'
 
 import type { TDecision, TOption } from './model'
 import { mustUseContext } from './model'
+import { Confirm, useConfirmModal } from './widgets'
 
 import './assets/fontawesome/css/all.min.css'
 
@@ -292,16 +293,10 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
 const Decision: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
 
-  let rmConfirm!: HTMLDivElement;
-  const rmDecision = () => {
-    rmConfirm.classList.add("is-active");
-  }
-  const cancelRmDecision = () => {
-    rmConfirm.classList.remove("is-active");
-  }
-  const actualRmDecision = () => setState(
-    "d",
-    (d: TDecision[]) => d.filter((decision) => decision.id !== props.decision.id)
+  let modal!: HTMLDivElement
+  const [openModal, closeModal] = useConfirmModal(() => modal);
+  const rmDecision = () => setState(
+    "d", (d: TDecision[]) => d.filter((decision) => decision.id !== props.decision.id)
   );
 
   const getRank = createMemo(() => {
@@ -332,7 +327,7 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
             </button>
           </div>
           <div class="level-item">
-            <button onClick={rmDecision}
+            <button onclick={openModal}
               class="button is-medium is-ghost has-text-danger" style="text-decoration: none">
               <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
             </button>
@@ -348,35 +343,16 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
           <button class="button is-link is-outlined is-small" onClick={toggleGear}>
             Toggle manage table
           </button>
-          <button onClick={rmDecision} class="button is-small is-outlined is-danger">
+          <button onclick={openModal} class="button is-small is-outlined is-danger">
             Delete
           </button>
         </div>
       </div>
     </div>
-    <div class="modal" ref={rmConfirm}>
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        <div class="card">
-          <div class="card-header has-text-light">
-            <p class="card-header-title">Confirm deletion</p>
-            <button onclick={cancelRmDecision} class="card-header-icon" aria-label="close">
-              <span class="icon"><i class="fa-solid fa-xmark"></i></span>
-            </button>
-          </div>
-          <div class="card-content">
-            <p>You are about to delete decision "{props.decision.title}".</p>
-            <p>This action cannot be undone.</p>
-          </div>
-          <div class="card-footer">
-            <div class="level is-mobile card-footer-item is-justify-content-flex-end">
-              <button onclick={cancelRmDecision} class="button is-text level-item">Cancel</button>
-              <button onclick={actualRmDecision} class="button is-danger level-item">Delete</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Confirm ref={modal} canceller={closeModal} title="Confirm deletion" actionName="Delete" action={rmDecision}>
+      <p>You are about to delete "{props.decision.title}"</p>
+      <p>This action cannot be undone!</p>
+    </Confirm>
     <div class="card-footer">
       <span class="card-footer-item"><p>{getRank()}</p></span>
     </div>
