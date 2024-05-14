@@ -192,13 +192,13 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
   )
 
   return (
-    <tr>
+    <tr classList={{"is-dark": !props.decision.gearing}}>
       <Show when={props.decision.gearing}>
-        <th></th>
+        <th class="has-background-black-ter"></th>
       </Show>
       <th>
         <div class="level is-mobile">
-          <div class="level-left"><span class="level-item">Options</span></div>
+          <div class="level-left"><span class="level-item">{props.decision.gearing?"":"Options"}</span></div>
             <div class="level-right">
             <Show when={!props.decision.gearing} fallback={
               <button class="button is-ghost">
@@ -228,11 +228,11 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
     parseFloat((e.target as HTMLInputElement).value.trim())
   )
   return (
-    <tr>
+    <tr classList={{"is-dark": !props.decision.gearing}}>
       <Show when={props.decision.gearing}>
-        <th></th>
+        <th class="has-background-black-ter"></th>
       </Show>
-      <th class="has-text-right">Weights</th>
+      <th class="has-text-weight-normal" style="vertical-align: middle;">{props.decision.gearing?"":"Weights"}</th>
       <For each={props.decision.factors}>{(F, i) => (
         <th>
           <Show when={!props.decision.gearing}
