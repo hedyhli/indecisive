@@ -17,7 +17,7 @@ export const Jumplist: Component = () => {
 
   return (
     <div class="dropdown is-hoverable is-up is-right"
-      style="position: fixed; bottom: 1rem; right: 1rem; z-index: 1000;">
+      style="position: fixed; bottom: 1rem; right: 1rem; z-index: calc(var(--bulma-modal-z)-1);">
       <div class="dropdown-trigger">
         <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
           <span>Jump to Decision</span>

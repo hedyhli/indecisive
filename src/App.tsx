@@ -14,10 +14,10 @@ const App: Component = () => {
   return (
     <DContext.Provider value={{state, setState}}>
       <main>
+        <Decisions />
         <Show when={state.d.length > 1}>
           <Jumplist />
         </Show>
-        <Decisions />
       </main>
     </DContext.Provider>
   );

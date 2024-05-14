@@ -358,16 +358,24 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
       <div class="modal-background"></div>
       <div class="modal-content">
         <div class="card">
-          <div class="card-content has-text-centered">
-            <p>Are you sure?</p>
+          <div class="card-header has-text-light">
+            <p class="card-header-title">Confirm deletion</p>
+            <button onclick={cancelRmDecision} class="card-header-icon" aria-label="close">
+              <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+            </button>
+          </div>
+          <div class="card-content">
+            <p>You are about to delete decision "{props.decision.title}".</p>
+            <p>This action cannot be undone.</p>
           </div>
           <div class="card-footer">
-            <button onclick={cancelRmDecision} class="button is-text card-footer-item">Cancel</button>
-            <button onclick={actualRmDecision} class="button is-danger card-footer-item">Delete</button>
+            <div class="level is-mobile card-footer-item is-justify-content-flex-end">
+              <button onclick={cancelRmDecision} class="button is-text level-item">Cancel</button>
+              <button onclick={actualRmDecision} class="button is-danger level-item">Delete</button>
+            </div>
           </div>
         </div>
       </div>
-      <button onclick={cancelRmDecision} class="modal-close is-large" aria-label="close"></button>
     </div>
     <div class="card-footer">
       <span class="card-footer-item"><p>{getRank()}</p></span>
