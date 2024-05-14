@@ -88,7 +88,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
       <div class="level-left has-text-left">
         <div class="level-item">
           <Show when={props.decision.editingTitle} fallback={
-            <h3 class="subtitle">{props.decision.title}</h3>
+            <h3 class="subtitle">{props.decision.id}: {props.decision.title}</h3>
           }>
             <input class="input" value={props.decision.title} onkeydown={editingTitle}></input>
           </Show>
@@ -114,6 +114,8 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
 
 const FactorName: Component<{decision: TDecision, i: number, f: number}> = (props) => {
   const {state, setState} = mustUseContext();
+  const name = () => props.decision.factors[props.f].name;
+
   const rmFactor = () => {
     let factors = [...props.decision.factors]
     if (factors.length == 1) {
@@ -121,7 +123,7 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
     }
     // Delete factor
     factors.splice(props.f, 1)
-    setState("d", props.f, {
+    setState("d", props.i, {
       factors: factors,
       options: props.decision.options.map((opt: TOption) => {
         // Delete value for each option
@@ -134,17 +136,26 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
 
   const addFactor = () => {
     setState("d", props.i, {
-      factors: [...props.decision.factors, {name: `Factor ${props.decision.factors.length+1}`, weight: 100}],
+      factors: [
+        ...props.decision.factors,
+        {name: `Factor ${props.decision.factors.length+1}`, weight: 100}
+      ],
       options: props.decision.options.map((opt) => ({
         ...opt, values: [...opt.values, 50]
       }))
     })
   }
 
+  const changedName = (e: Event) => {
+    setState("d", props.i, "factors", props.f, { name: (e.target as HTMLInputElement).value })
+  }
+
   return (
-    <div class="level is-mobile">
-      <div class="level-left">
-        <div class="level-item">{props.decision.factors[props.f].name}</div>
+    <div style="gap: 0" class="level" classList={{"is-mobile": !props.decision.gearing}}>
+      <div style="min-width: 0;">
+          <Show when={props.decision.gearing} fallback={<div class="level-item">{name()}</div>}>
+            <input style="min-width:7rem" class="input level-item" value={name()} onChange={changedName}></input>
+          </Show>
       </div>
       <div class="level-right">
         <div class="level-item">
@@ -202,7 +213,7 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
         </div>
       </th>
       <For each={props.decision.factors}>{(_, f) => (
-        <th>
+        <th style={props.decision.gearing ? "padding-left:0;padding-right:0;" : ""}>
           <FactorName decision={props.decision} i={props.i} f={f()} />
         </th>
       )}</For>
@@ -262,19 +273,19 @@ const Table: Component<{decision: TDecision, i: number}> = (props) => {
         <For each={props.decision.options}>{(O, i) => (
           <tr>
             <Show when={props.decision.gearing}>
-              <td>
+              <td style="padding-left:0; padding-right:0">
                 <button class="button is-text has-text-danger"
                   style="text-decoration: none" onClick={[rmOption, i()]}>
                   <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
                 </button>
               </td>
             </Show>
-            <td>
-              <Show when={props.decision.gearing} fallback={O.name}>
+            <Show when={props.decision.gearing} fallback={<td>{O.name}</td>}>
+              <td style="padding-left:0; padding-right:0">
                 <input class="input" type="text" value={O.name}
                   onChange={[changedOption, i()]}></input>
-              </Show>
-            </td>
+              </td>
+            </Show>
             <For each={O.values}>{(val, v) => (
               <td>
                 <Show when={!props.decision.gearing} fallback={val}>
