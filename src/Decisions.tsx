@@ -21,17 +21,18 @@ export const Decisions: Component = () => {
         unused_ids[state.d[i].id] = false;
       }
       return [
-      {
-        id: unused_ids.findIndex((v) => v), // Should not be -1
-        editingTitle: false,
-        title: `What needs to be decided?`,
-        options: [{ name: "SolidJS", values: [50] }],
-        factors: [{ name: "Hype", weight: 100 }],
-      }, ...state.d]
+        {
+          id: unused_ids.findIndex((v) => v), // Should not be -1
+          editingTitle: false,
+          title: `What needs to be decided?`,
+          options: [{ name: "SolidJS", values: [50] }],
+          factors: [{ name: "Hype", weight: 100 }],
+        }, ...state.d
+      ]
     })
   }
 
-  return <div>
+  return <>
     <div class="block">
       <div class="level is-mobile">
         <div class="level-left">
@@ -61,7 +62,7 @@ export const Decisions: Component = () => {
         )}</For>
       </Show>
     </div>
-  </div>
+  </>
 }
 
 const Title: Component<{decision: TDecision, i: number}> = (props) => {
@@ -82,8 +83,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
   editedTitle = () => setState("d", props.i, {title: newTitle(), editingTitle: false}),
   cancelEditTitle = () => setState("d", props.i, {editingTitle: false});
 
-  return (<>
-    <code style="margin-left: -1rem; margin-right: 1rem;">{props.decision.id}</code>
+  return (
     <div class="level is-mobile">
       <div class="level-left has-text-left">
         <div class="level-item">
@@ -109,7 +109,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
         </div>
       </div>
     </div>
-  </>)
+  )
 }
 
 const FactorName: Component<{decision: TDecision, i: number, f: number}> = (props) => {
