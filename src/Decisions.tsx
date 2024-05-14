@@ -88,7 +88,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
       <div class="level-left has-text-left">
         <div class="level-item">
           <Show when={props.decision.editingTitle} fallback={
-            <h3 class="subtitle">{props.decision.id}: {props.decision.title}</h3>
+            <h3 class="subtitle">{props.decision.title}</h3>
           }>
             <input class="input" value={props.decision.title} onkeydown={editingTitle}></input>
           </Show>
