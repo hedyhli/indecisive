@@ -1,13 +1,13 @@
 import type { Component } from 'solid-js';
 
 import { createSignal, createMemo } from 'solid-js';
-import { For, Show, Switch, Match } from 'solid-js/web'
+import { For, Show, Switch, Match } from 'solid-js/web';
 
-import type { TDecision, TOption } from './model'
-import { mustUseContext } from './model'
-import { Confirm, useConfirmModal } from './widgets'
+import type { TDecision, TOption } from './model';
+import { mustUseContext } from './model';
+import { Confirm, useConfirmModal } from './widgets';
 
-import './assets/fontawesome/css/all.min.css'
+import './assets/fontawesome/css/all.min.css';
 
 export const Decisions: Component = () => {
   const {state, setState} = mustUseContext();
@@ -28,9 +28,9 @@ export const Decisions: Component = () => {
           options: [{ name: "SolidJS", values: [50] }],
           factors: [{ name: "Hype", weight: 100 }],
         }, ...state.d
-      ]
-    })
-  }
+      ];
+    });
+  };
 
   return <>
     <div class="block">
@@ -62,7 +62,7 @@ export const Decisions: Component = () => {
         )}</For>
       </Show>
     </div>
-  </>
+  </>;
 }
 
 const Title: Component<{decision: TDecision, i: number}> = (props) => {
@@ -109,20 +109,25 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const FactorName: Component<{decision: TDecision, i: number, f: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const name = () => props.decision.factors[props.f].name;
 
+  /**
+   * Remove the factor name from list of factors, and remove the factor value
+   * from each option.
+   */
   const rmFactor = () => {
-    let factors = [...props.decision.factors]
+    let factors = [...props.decision.factors];
     if (factors.length == 1) {
-      return
+      // Avoid deleting all factors.
+      return;
     }
     // Delete factor
-    factors.splice(props.f, 1)
+    factors.splice(props.f, 1);
     setState("d", props.i, {
       factors: factors,
       options: props.decision.options.map((opt: TOption) => {
@@ -131,31 +136,32 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
         values.splice(props.f, 1)
         return { ...opt, values }
       }
-    )})
-  }
+    )});
+  };
 
+  /**
+   * Add factor name to factor list, and add a default value to each option.
+   */
   const addFactor = () => {
+    setState("d", props.i, "factors", props.decision.factors.length,{
+      name: `Factor ${props.decision.factors.length+1}`,
+      weight: 100
+    })
     setState("d", props.i, {
-      factors: [
-        ...props.decision.factors,
-        {name: `Factor ${props.decision.factors.length+1}`, weight: 100}
-      ],
       options: props.decision.options.map((opt) => ({
         ...opt, values: [...opt.values, 50]
       }))
     })
-  }
-
+  };
   const changedName = (e: Event) => {
-    setState("d", props.i, "factors", props.f, { name: (e.target as HTMLInputElement).value })
-  }
+    setState("d", props.i, "factors", props.f, "name", (e.target as HTMLInputElement).value)
+  };
 
   return (
     <div style="gap: 0" class="level" classList={{"is-mobile": !props.decision.gearing}}>
       <div style="min-width: 0;">
-          <Show when={props.decision.gearing} fallback={<div class="level-item">{name()}</div>}>
-            <input style="min-width:7rem" class="input level-item" value={name()} onChange={changedName}></input>
-          </Show>
+        <input style="min-width:7rem" class="has-text-weight-bold input is-static level-item"
+          value={name()} onChange={changedName}></input>
       </div>
       <div class="level-right">
         <div class="level-item">
@@ -180,16 +186,19 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
         </div>
       </div>
     </div>
-  )
+  );
 }
 
+/**
+ * Table header with factor names.
+ */
 const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
 
   const addOption = () => setState(
     "d", props.i, "options", props.decision.options.length,
     { name: "Another Option", values: [ ...props.decision.options[0].values ] }
-  )
+  );
 
   return (
     <tr classList={{"is-dark": !props.decision.gearing}}>
@@ -213,92 +222,102 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
         </div>
       </th>
       <For each={props.decision.factors}>{(_, f) => (
-        <th style={props.decision.gearing ? "padding-left:0;padding-right:0;" : ""}>
-          <FactorName decision={props.decision} i={props.i} f={f()} />
-        </th>
+        <th><FactorName {...props} f={f()} /></th>
       )}</For>
     </tr>
   );
 }
 
+/**
+ * Table footer with factor weights.
+ */
 const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const changedWeight = (w: number, e: Event) => setState(
     "d", props.i, "factors", w, "weight",
     parseFloat((e.target as HTMLInputElement).value.trim())
-  )
+  );
   return (
     <tr classList={{"is-dark": !props.decision.gearing}}>
       <Show when={props.decision.gearing}>
         <th class="has-background-black-ter"></th>
       </Show>
-      <th class="has-text-weight-normal" style="vertical-align: middle;">{props.decision.gearing?"":"Weights"}</th>
+      <th style="vertical-align: middle;">{props.decision.gearing?"":"Weights"}</th>
       <For each={props.decision.factors}>{(F, i) => (
         <th>
-          <Show when={!props.decision.gearing}
-                fallback=<span style="font-weight:normal;">{F.weight}</span>
-          >
-            <input class="input is-static" type="number" value={F.weight}
-              onChange={[changedWeight, i()]}></input>
-          </Show>
+          <input class="has-text-weight-bold input is-static" type="number" value={F.weight}
+            onChange={[changedWeight, i()]}></input>
         </th>
       )}</For>
     </tr>
   );
 }
 
-const Table: Component<{decision: TDecision, i: number}> = (props) => {
+/**
+ * A row with option names and values.
+ */
+const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) => {
   const {state, setState} = mustUseContext();
+  const O = () => props.decision.options[props.o];
 
-  const rmOption = (o: number) => {
-    let options = [...props.decision.options]
-    options.splice(o, 1)
-    setState("d", props.i, "options", options)
-  }
-  const changedOption = (o: number, e: Event) => {
-    setState("d", props.i, "options", o, { name: (e.target as HTMLInputElement).value })
-  }
-  const changedValue = ({ o, v }: {o: number, v: number}, e: Event) => {
+  const rmOption = () => {
+    if (props.decision.options.length == 1) {
+      // Avoid deleting all options.
+      return;
+    }
+    let options = [...props.decision.options];
+    options.splice(props.o, 1);
+    setState("d", props.i, "options", options);
+  };
+  const changedOption = (e: Event) => {
+    setState("d", props.i, "options", props.o, "name", (e.target as HTMLInputElement).value);
+  };
+  const changedValue = (v: number, e: Event) => {
     setState(
-      "d", props.i, "options", o, "values", v,
+      "d", props.i, "options", props.o, "values", v,
       parseFloat((e.target as HTMLInputElement).value.trim())
     )
-  }
+  };
 
-  return (<div class="table-container">
+  return <tr>
+    {/* Delete option */}
+    <Show when={props.decision.gearing}>
+      <td style="padding-left:0; padding-right:0">
+        <button class="button is-text has-text-danger"
+          style="text-decoration: none" onClick={rmOption}>
+          <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
+        </button>
+      </td>
+    </Show>
+    {/* Option name */}
+    <td style={"padding-right:0" + (props.decision.gearing? ";padding-left:0": "")}>
+      <input class="input is-static" type="text" value={O().name}
+        onChange={changedOption}></input>
+    </td>
+    {/* Values */}
+    <For each={O().values}>{(val, v) => (
+      <td style="vertical-align:middle">
+        <Show when={!props.decision.gearing} fallback={val}>
+          <input class="input is-static" type="number" value={val}
+            onChange={[changedValue, v()]}></input>
+        </Show>
+      </td>
+    )}</For>
+  </tr>;
+}
+
+const Table: Component<{decision: TDecision, i: number}> = (props) => {
+  return <div class="table-container">
     <table class="table is-fullwidth has-background-black-ter">
-      <thead><TblHead decision={props.decision} i={props.i} /></thead>
-      <tfoot><TblFoot decision={props.decision} i={props.i} /></tfoot>
+      <thead><TblHead {...props} /></thead>
+      <tfoot><TblFoot {...props} /></tfoot>
       <tbody>
-        <For each={props.decision.options}>{(O, i) => (
-          <tr>
-            <Show when={props.decision.gearing}>
-              <td style="padding-left:0; padding-right:0">
-                <button class="button is-text has-text-danger"
-                  style="text-decoration: none" onClick={[rmOption, i()]}>
-                  <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
-                </button>
-              </td>
-            </Show>
-            <Show when={props.decision.gearing} fallback={<td>{O.name}</td>}>
-              <td style="padding-left:0; padding-right:0">
-                <input class="input" type="text" value={O.name}
-                  onChange={[changedOption, i()]}></input>
-              </td>
-            </Show>
-            <For each={O.values}>{(val, v) => (
-              <td>
-                <Show when={!props.decision.gearing} fallback={val}>
-                  <input class="input is-static" type="number" value={val}
-                    onChange={[changedValue, {o: i(), v: v()}]}></input>
-                </Show>
-              </td>
-            )}</For>
-          </tr>
-        )}</For>
+        <For each={props.decision.options}>{
+          (_, i) => <TblRow {...props} o={i()} />
+        }</For>
       </tbody>
     </table>
-  </div>)
+  </div>;
 }
 
 const Decision: Component<{decision: TDecision, i: number}> = (props) => {
@@ -318,8 +337,8 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
     ])
     evals = evals.sort((e1, e2) => e2[0] - e1[0])
     return evals.map((ev) => `${ev[1]} (${ev[0]})`).join(", ")
-  })
-  const toggleGear = () => setState("d", props.i, { gearing: !state.d[props.i].gearing })
+  });
+  const toggleGear = () => setState("d", props.i, {gearing: !state.d[props.i].gearing});
 
   // Actual decision table component I'll prolly use
   return <div class="card has-background-black-ter" id={`decision${props.decision.id}`}>
