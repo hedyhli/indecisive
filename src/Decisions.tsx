@@ -197,7 +197,7 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
 
   const addOption = () => setState(
     "d", props.i, "options", props.decision.options.length,
-    { name: "Another Option", values: [ ...props.decision.options[0].values ] }
+    { name: "Another Option", values: Array(props.decision.factors.length).fill(50) }
   );
 
   return (
