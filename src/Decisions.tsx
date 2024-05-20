@@ -162,16 +162,23 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
     })
   };
   const changedName = (e: Event) => {
-    setState("d", props.i, "factors", props.f, "name", (e.target as HTMLInputElement).value)
+    setState("d", props.i, "factors", props.f, "name",
+      (e.target as HTMLSpanElement).textContent!.toString());
   };
 
   return (
     <div style="gap: 0" class="level" classList={{"is-mobile": !props.decision.gearing}}>
       <div style="min-width: 0;">
-        <input
-          style="min-width:7rem"
-          class="has-text-weight-bold input is-static level-item"
-          value={name()} onChange={changedName}></input>
+        <span
+          style="white-space:nowrap;text-align:left;"
+          class="has-text-weight-bold level-item"
+          classList={{"is-justify-content-flex-start": !props.decision.gearing}}
+          role="textbox" contenteditable={!props.decision.gearing}
+          onBlur={changedName}
+          onFocus={(e) => e.target.textContent = name()}
+        >
+          {name()}
+        </span>
       </div>
       <div class="level-right">
         <div class="level-item">
@@ -187,11 +194,11 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
                 <span class="icon"><i class="fa-solid fa-plus"></i></span>
               </button>
             </Match>
-            <Match when={!props.decision.gearing}>
-              <button class="button is-ghost">
+            {/*<Match when={!props.decision.gearing}>
+              <button class="button is-ghost" style="cursor:default;">
                 <span class="icon"></span>
               </button>
-            </Match>
+            </Match>*/}
           </Switch>
         </div>
       </div>
@@ -234,7 +241,7 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
       <For each={props.decision.factors}>{(_, f) => (
         <th
           classList={{"has-background-black-ter": props.decision.gearing}}
-          style="position:sticky;top:0;z-index:5"
+          style="position:sticky;top:0;z-index:5; vertical-align: middle;"
         >
           <FactorName {...props} f={f()} />
         </th>
@@ -250,7 +257,7 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
   const {state, setState} = mustUseContext();
   const changedWeight = (w: number, e: Event) => setState(
     "d", props.i, "factors", w, "weight",
-    parseFloat((e.target as HTMLInputElement).value.trim())
+    parseFloat((e.target as HTMLSpanElement).textContent!.trim())
   );
   return (
     <tr classList={{"is-dark": !props.decision.gearing}}>
@@ -259,8 +266,10 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
       </th>
       <For each={props.decision.factors}>{(F, i) => (
         <th style="position:sticky;bottom:0;z-index:5">
-          <input class="has-text-weight-bold input is-static" type="number" value={F.weight}
-            onChange={[changedWeight, i()]}></input>
+          <span class="has-text-weight-bold"
+            contenteditable={!props.decision.gearing}
+            onFocus={(e) => e.target.textContent = F.weight.toString()}
+            onBlur={[changedWeight, i()]}>{F.weight}</span>
         </th>
       )}</For>
     </tr>
@@ -284,12 +293,13 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
     setState("d", props.i, "options", options);
   };
   const changedOption = (e: Event) => {
-    setState("d", props.i, "options", props.o, "name", (e.target as HTMLInputElement).value);
+    setState("d", props.i, "options", props.o, "name",
+      (e.target as HTMLSpanElement).textContent!.trim());
   };
   const changedValue = (v: number, e: Event) => {
     setState(
       "d", props.i, "options", props.o, "values", v,
-      parseFloat((e.target as HTMLInputElement).value.trim())
+      parseFloat((e.target as HTMLSpanElement).textContent!.trim())
     )
   };
 
@@ -306,15 +316,19 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
         </button>
       </Show>
       {/* Option name */}
-      <input style="width:min-content;" class="input is-static" type="text" value={O().name}
-        onChange={changedOption}></input>
+      <span style="width:min-content;height:1.5rem;"
+        contenteditable={!props.decision.gearing}
+        onFocus={(e) => e.target.textContent = O().name}
+        onBlur={changedOption}>{O().name}</span>
     </td>
     {/* Values */}
     <For each={O().values}>{(val, v) => (
-      <td style="vertical-align:middle">
+      <td style="vertical-align:middle;">
         <Show when={!props.decision.gearing} fallback={val}>
-          <input class="input is-static" type="number" value={val}
-            onChange={[changedValue, v()]}></input>
+          <span style="height:1.5em;"
+            contentEditable
+            onFocus={(e) => e.target.textContent = val.toString()}
+            onBlur={[changedValue, v()]}>{val}</span>
         </Show>
       </td>
     )}</For>
