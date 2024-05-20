@@ -48,7 +48,9 @@ export const Decisions: Component = () => {
                 </span>
               </span>
               <span class="is-hidden-tablet">
-                <span class="icon is-hidden-tablet"><i class="fa-solid fa-plus"></i></span>
+                <span class="icon is-hidden-tablet">
+                  <i class="fa-solid fa-plus"></i>
+                </span>
               </span>
             </button>
           </div>
@@ -90,21 +92,27 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
           <Show when={props.decision.editingTitle} fallback={
             <h3 class="subtitle">{props.decision.title}</h3>
           }>
-            <input class="input" value={props.decision.title} onkeydown={editingTitle}></input>
+            <input
+              class="input" value={props.decision.title}
+              onkeydown={editingTitle}></input>
           </Show>
         </div>
       </div>
       <div class="level-right">
         <div class="level-item">
           <Show when={props.decision.editingTitle} fallback={
-            <button onClick={startEditTitle} class="button is-small is-outlined is-primary">
+            <button
+              onClick={startEditTitle}
+              class="button is-small is-outlined is-primary">
               <span class="icon"><i class="fa-solid fa-pencil"></i></span>
             </button>
           }>
             <button class="button is-primary is-small" onclick={editedTitle}>
               <span class="icon"><i class="fa-solid fa-check"></i></span>
             </button>
-            <button class="button is-danger is-text" onclick={cancelEditTitle}>Cancel</button>
+            <button
+              class="button is-danger is-text"
+              onclick={cancelEditTitle}>Cancel</button>
           </Show>
         </div>
       </div>
@@ -160,7 +168,9 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
   return (
     <div style="gap: 0" class="level" classList={{"is-mobile": !props.decision.gearing}}>
       <div style="min-width: 0;">
-        <input style="min-width:7rem" class="has-text-weight-bold input is-static level-item"
+        <input
+          style="min-width:7rem"
+          class="has-text-weight-bold input is-static level-item"
           value={name()} onChange={changedName}></input>
       </div>
       <div class="level-right">
@@ -201,14 +211,14 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
   );
 
   return (
-    <tr classList={{"is-dark": !props.decision.gearing}}>
-      <Show when={props.decision.gearing}>
-        <th class="has-background-black-ter"></th>
-      </Show>
-      <th>
+    <tr classList={{"is-dark": !props.decision.gearing }}>
+      <th style="position:sticky;left:0;top:0;z-index:6;"
+        classList={{"has-background-black-ter": props.decision.gearing}}>
         <div class="level is-mobile">
-          <div class="level-left"><span class="level-item">{props.decision.gearing?"":"Options"}</span></div>
-            <div class="level-right">
+          <div class="level-left">
+            <span class="level-item">{props.decision.gearing?"":"Options"}</span>
+          </div>
+          <div class="level-right">
             <Show when={!props.decision.gearing} fallback={
               <button class="button is-ghost">
                 <span class="icon"></span>
@@ -218,11 +228,16 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
                 <span class="icon"><i class="fa-solid fa-plus"></i></span>
               </button>
             </Show>
-            </div>
+          </div>
         </div>
       </th>
       <For each={props.decision.factors}>{(_, f) => (
-        <th><FactorName {...props} f={f()} /></th>
+        <th
+          classList={{"has-background-black-ter": props.decision.gearing}}
+          style="position:sticky;top:0;z-index:5"
+        >
+          <FactorName {...props} f={f()} />
+        </th>
       )}</For>
     </tr>
   );
@@ -239,12 +254,11 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
   );
   return (
     <tr classList={{"is-dark": !props.decision.gearing}}>
-      <Show when={props.decision.gearing}>
-        <th class="has-background-black-ter"></th>
-      </Show>
-      <th style="vertical-align: middle;">{props.decision.gearing?"":"Weights"}</th>
+      <th style="vertical-align: middle;position:sticky;left:0;bottom:0;z-index:6;">
+        {props.decision.gearing?"":"Weights"}
+      </th>
       <For each={props.decision.factors}>{(F, i) => (
-        <th>
+        <th style="position:sticky;bottom:0;z-index:5">
           <input class="has-text-weight-bold input is-static" type="number" value={F.weight}
             onChange={[changedWeight, i()]}></input>
         </th>
@@ -280,18 +294,19 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
   };
 
   return <tr>
-    {/* Delete option */}
-    <Show when={props.decision.gearing}>
-      <td style="padding-left:0; padding-right:0">
+    <td style={
+      "white-space:nowrap;position:sticky;left:0;z-index:4;padding-right:0;"
+        + (props.decision.gearing ? ";padding-left:0": "")
+    } class="has-background-black-ter">
+      {/* Delete option */}
+      <Show when={props.decision.gearing}>
         <button class="button is-text has-text-danger"
           style="text-decoration: none" onClick={rmOption}>
           <span class="icon"><i class="fa-solid fa-trash" aria-hidden="true"></i></span>
         </button>
-      </td>
-    </Show>
-    {/* Option name */}
-    <td style={"padding-right:0" + (props.decision.gearing? ";padding-left:0": "")}>
-      <input class="input is-static" type="text" value={O().name}
+      </Show>
+      {/* Option name */}
+      <input style="width:min-content;" class="input is-static" type="text" value={O().name}
         onChange={changedOption}></input>
     </td>
     {/* Values */}
@@ -307,10 +322,12 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
 }
 
 const Table: Component<{decision: TDecision, i: number}> = (props) => {
-  return <div class="table-container">
+  return <div class="table-container" style="max-height:30rem;overflow-y:auto;">
     <table class="table is-fullwidth has-background-black-ter">
       <thead><TblHead {...props} /></thead>
-      <tfoot><TblFoot {...props} /></tfoot>
+      <Show when={!props.decision.gearing}>
+        <tfoot><TblFoot {...props} /></tfoot>
+      </Show>
       <tbody>
         <For each={props.decision.options}>{
           (_, i) => <TblRow {...props} o={i()} />
