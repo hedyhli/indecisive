@@ -25,9 +25,27 @@ const App: Component = () => {
 
 /* TODO
  *
- * When gearing:
- *   Make option names and factor names into inputs, onChange updates
+ * !1
+ * Same heights, more breathing space like option row
+ * (both height & padding of spans when focused)
+ * Boldify top options (with ties)
+ * Refactor CSS lol
+ *
+ * !2
  * Gear button feedback for whether current state is gearing or not
+ * Left columns' right borders
+ * Export as CSV, JSON
+ *
+ * !3
+ * Rearrange factors
+ *   options
+ *   decisions
+ * Show percentile in () rather than value
+ * Export to spreadsheet formats (see Lume plugin?)
+ *
+ * !4
+ * Rank bg colors
+ * Resizable columns? lol
  *
  * */
 
