@@ -40,7 +40,7 @@ export const Confirm: Component<{
       <div class="modal-background"></div>
       <div class="modal-content">
         <div class="card">
-          <div class="card-header has-text-light">
+          <div class="card-header card-header-themed">
             <p class="card-header-title">{props.title}</p>
             <button onclick={props.canceller} class="card-header-icon" aria-label="close">
               <span class="icon"><i class="fa-solid fa-xmark"></i></span>

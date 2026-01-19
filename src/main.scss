@@ -1,9 +1,95 @@
-@use "bulma/sass" with (
-$info: hsla(197, 93%, 29%, 1),
-$link: hsla(187, 97%, 29%, 1),
-$primary: hsla(174, 100%, 33%, 1),
-$success: hsla(167, 77%, 57%, 0.49),
-$warning: hsla(63, 69%, 85%, 1),
-$danger: hsl(0deg 87.23% 74.77%),
-$box-shadow: none,
+@use "bulma/sass" as bulma with (
+	$info: hsla(197, 93%, 29%, 1),
+	$link: hsla(187, 97%, 29%, 1),
+	$primary: hsla(174, 100%, 33%, 1),
+	$success: hsla(167, 77%, 57%, 0.49),
+	$warning: hsla(63, 69%, 85%, 1),
+	$danger: hsl(0deg 87.23% 74.77%),
+	$box-shadow: none,
 );
+
+:root {
+	/* light mode colors */
+	--color-info: hsla(197, 93%, 29%, 1);
+	--color-link: hsla(187, 97%, 29%, 1);
+	--color-primary: hsla(174, 100%, 45%, 1);
+	--color-success: hsla(167, 77%, 57%, 0.49);
+	--color-warning: hsla(63, 69%, 85%, 1);
+	--color-danger: hsl(0deg 87.23% 74.77%);
+	--bg: #ffffff;
+	--text: #0a0a0a;
+
+	/* card colors follow Bulma presets but exposed as CSS variables */
+	--card-bg: #{bulma.$white-ter};
+	--card-text: var(--text);
+}
+
+/* follow system preference for dark mode */
+@media (prefers-color-scheme: dark) {
+	:root {
+		/* tuned dark values */
+		--color-info: hsla(197, 93%, 55%, 1);
+		--color-link: hsla(187, 97%, 60%, 1);
+		--color-primary: hsla(174, 100%, 33%, 1);
+		--color-success: hsla(167, 77%, 45%, 0.6);
+		--color-warning: hsla(50, 20%, 25%, 1);
+		--color-danger: hsl(0deg 70% 65%);
+		--bg: #0b0b0d;
+		--text: #e6e6e6;
+
+		/* tuned dark card values */
+		--card-bg: #{bulma.$black-ter};
+		--card-text: var(--text);
+	}
+}
+
+/* ensure base page picks up variables */
+body {
+	background-color: var(--bg);
+	color: var(--text);
+	/* small transition for smooth change if user toggles */
+	transition: background-color .2s ease, color .2s ease;
+}
+
+/* Map Bulma helper classes and provide themed card helpers */
+.card-themed {
+	background-color: var(--card-bg) !important;
+	color: var(--card-text) !important;
+}
+.card-header-themed {
+	color: var(--card-text) !important;
+}
+
+.table.card-themed tr.gearing th {
+	background-color: var(--card-bg) !important;
+	color: var(--card-text) !important;
+}
+.table.card-themed tr.gearing:hover th {
+	background-color: var(--table-row-hover) !important;
+}
+.table.card-themed tr:not(.gearing) td,
+.table.card-themed tr:not(.gearing) th {
+	background-color: var(--table-bg) !important;
+	color: var(--table-text) !important;
+}
+.table.card-themed thead tr,
+.table.card-themed tfoot tr {
+    background-color: #{bulma.$grey-lighter} !important;
+    color: var(--card-text) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .table.card-themed thead tr,
+    .table.card-themed tfoot tr {
+        background-color: #{bulma.$dark} !important;
+    }
+}
+
+/* backward compatibility: keep existing helper class names pointing to variables */
+// .has-background-black-ter {
+// 	background-color: var(--card-bg) !important;
+// 	color: var(--card-text) !important;
+// }
+// .card-header.has-text-light {
+// 	color: var(--card-text) !important;
+// }

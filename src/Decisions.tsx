@@ -218,9 +218,9 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
   );
 
   return (
-    <tr classList={{"is-dark": !props.decision.gearing }}>
+    <tr classList={{"gearing": props.decision.gearing}}>
       <th style="position:sticky;left:0;top:0;z-index:6;"
-        classList={{"has-background-black-ter": props.decision.gearing}}>
+        classList={{"card-themed": props.decision.gearing}}>
         <div class="level is-mobile">
           <div class="level-left">
             <span class="level-item">{props.decision.gearing?"":"Options"}</span>
@@ -240,7 +240,7 @@ const TblHead: Component<{decision: TDecision, i: number}> = (props) => {
       </th>
       <For each={props.decision.factors}>{(_, f) => (
         <th
-          classList={{"has-background-black-ter": props.decision.gearing}}
+          classList={{"card-themed": props.decision.gearing}}
           style="position:sticky;top:0;z-index:5; vertical-align: middle;"
         >
           <FactorName {...props} f={f()} />
@@ -260,7 +260,7 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
     parseFloat((e.target as HTMLSpanElement).textContent!.trim())
   );
   return (
-    <tr classList={{"is-dark": !props.decision.gearing}}>
+    <tr classList={{"gearing": props.decision.gearing}}>
       <th style="vertical-align: middle;position:sticky;left:0;bottom:0;z-index:6;">
         {props.decision.gearing?"":"Weights"}
       </th>
@@ -307,7 +307,7 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
     <td style={
       "white-space:nowrap;position:sticky;left:0;z-index:4;padding-right:0;"
         + (props.decision.gearing ? ";padding-left:0": "")
-    } class="has-background-black-ter">
+    }>
       {/* Delete option */}
       <Show when={props.decision.gearing}>
         <button class="button is-text has-text-danger"
@@ -337,7 +337,7 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
 
 const Table: Component<{decision: TDecision, i: number}> = (props) => {
   return <div class="table-container" style="max-height:30rem;overflow-y:auto;">
-    <table class="table is-fullwidth has-background-black-ter">
+    <table class="table is-fullwidth card-themed">
       <thead><TblHead {...props} /></thead>
       <Show when={!props.decision.gearing}>
         <tfoot><TblFoot {...props} /></tfoot>
@@ -372,7 +372,7 @@ const Decision: Component<{decision: TDecision, i: number}> = (props) => {
   const toggleGear = () => setState("d", props.i, {gearing: !state.d[props.i].gearing});
 
   // Actual decision table component I'll prolly use
-  return <div class="card has-background-black-ter" id={`decision${props.decision.id}`}>
+    return <div class="card card-themed" id={`decision${props.decision.id}`}>
     <div class="card-content">
       <div class="level is-hidden-mobile">
         <div class="level-left">
