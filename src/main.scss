@@ -51,6 +51,10 @@ body {
 	transition: background-color .2s ease, color .2s ease;
 }
 
+footer {
+	color: #{bulma.$grey-lighter};
+}
+
 /* Map Bulma helper classes and provide themed card helpers */
 .card-themed {
 	background-color: var(--card-bg) !important;
