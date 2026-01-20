@@ -171,8 +171,11 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
       <div style="min-width: 0;">
         <span
           style="white-space:nowrap;text-align:left;"
-          class="has-text-weight-bold level-item"
-          classList={{"is-justify-content-flex-start": !props.decision.gearing}}
+          class="level-item"
+          classList={{
+            "is-justify-content-flex-start": !props.decision.gearing,
+            "has-text-weight-bold": !props.decision.gearing,
+          }}
           role="textbox" contenteditable={!props.decision.gearing}
           onBlur={changedName}
           onFocus={(e) => e.target.textContent = name()}
@@ -266,7 +269,7 @@ const TblFoot: Component<{decision: TDecision, i: number}> = (props) => {
       </th>
       <For each={props.decision.factors}>{(F, i) => (
         <th style="position:sticky;bottom:0;z-index:5">
-          <span class="has-text-weight-bold"
+          <span
             contenteditable={!props.decision.gearing}
             onFocus={(e) => e.target.textContent = F.weight.toString()}
             onBlur={[changedWeight, i()]}>{F.weight}</span>
@@ -303,7 +306,7 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
     )
   };
 
-  return <tr>
+  return <tr classList={{"gearing": props.decision.gearing}}>
     <td style={
       "white-space:nowrap;position:sticky;left:0;z-index:4;padding-right:0;"
         + (props.decision.gearing ? ";padding-left:0": "")

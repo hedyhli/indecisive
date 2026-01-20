@@ -22,6 +22,10 @@
 	/* card colors follow Bulma presets but exposed as CSS variables */
 	--card-bg: #{bulma.$white-ter};
 	--card-text: var(--text);
+
+    --table-bg: var(--card-bg);
+    --table-text: var(--text);
+    --table-head-bg: #{bulma.$grey-lighter};
 }
 
 /* follow system preference for dark mode */
@@ -40,6 +44,10 @@
 		/* tuned dark card values */
 		--card-bg: #{bulma.$black-ter};
 		--card-text: var(--text);
+
+    --table-bg: #{bulma.$black-bis};
+    --table-text: var(--text);
+    --table-head-bg: #{bulma.$dark};
 	}
 }
 
@@ -64,36 +72,36 @@ footer {
 	color: var(--card-text) !important;
 }
 
-.table.card-themed tr.gearing th {
-	background-color: var(--card-bg) !important;
-	color: var(--card-text) !important;
+@mixin table-select-cell($gearing: "no", $first-child: "no") {
+  $ge: if($gearing == "gearing", ".gearing", ":not(.gearing)");
+  $fc: if($first-child == "first-child", ":first-child", "");
+  $bfc: if($first-child == "first-child" or $first-child == "middle", ":first-child", "");
+  thead > tr#{$ge} > th#{$fc},
+  tbody > tr#{$ge} > td#{$bfc},
+  tfoot > tr#{$ge} > th#{$fc} {
+    @content;
+  }
 }
-.table.card-themed tr.gearing:hover th {
-	background-color: var(--table-row-hover) !important;
-}
-.table.card-themed tr:not(.gearing) td,
-.table.card-themed tr:not(.gearing) th {
-	background-color: var(--table-bg) !important;
-	color: var(--table-text) !important;
-}
-.table.card-themed thead tr,
-.table.card-themed tfoot tr {
-    background-color: #{bulma.$grey-lighter} !important;
+
+.table.card-themed {
+  @include table-select-cell("no") {
+    background-color: var(--table-bg) !important;
+    color: var(--table-text) !important;
+  }
+  @include table-select-cell("no", "middle") {
+    background-color: var(--table-head-bg) !important;
+  }
+  @include table-select-cell("no", "first-child") {
+    // box-shadow: 2px 0 5px -2px rgba(0,0,0,0.2);
+    border-right: 2px solid red;
+  }
+  @include table-select-cell("gearing") {
+    background-color: var(--card-bg) !important;
     color: var(--card-text) !important;
+    font-weight: normal;
+  }
+  @include table-select-cell("gearing", "middle") {
+    background-color: var(--card-bg) !important;
+    color: var(--card-text) !important;
+  }
 }
-
-@media (prefers-color-scheme: dark) {
-    .table.card-themed thead tr,
-    .table.card-themed tfoot tr {
-        background-color: #{bulma.$dark} !important;
-    }
-}
-
-/* backward compatibility: keep existing helper class names pointing to variables */
-// .has-background-black-ter {
-// 	background-color: var(--card-bg) !important;
-// 	color: var(--card-text) !important;
-// }
-// .card-header.has-text-light {
-// 	color: var(--card-text) !important;
-// }
