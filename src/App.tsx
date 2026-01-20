@@ -29,10 +29,8 @@ const App: Component = () => {
  * Same heights, more breathing space like option row
  * (both height & padding of spans when focused)
  * Boldify top options (with ties)
- * Refactor CSS lol
  *
  * !2
- * Gear button feedback for whether current state is gearing or not
  * Left columns' right borders
  * Export as CSV, JSON
  *

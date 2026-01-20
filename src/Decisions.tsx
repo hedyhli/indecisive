@@ -75,12 +75,14 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
   editingTitle = (e: KeyboardEvent) => {
     if (e.key == 'Escape') {
       setNewTitle(props.decision.title);
-      return cancelEditTitle();
+      cancelEditTitle();
+      return;
     }
-    setNewTitle((e.currentTarget as HTMLInputElement).value);
     if (e.key == 'Enter') {
       editedTitle();
+      return;
     }
+    setNewTitle((e.currentTarget as HTMLInputElement).value);
   },
   editedTitle = () => setState("d", props.i, {title: newTitle(), editingTitle: false}),
   cancelEditTitle = () => setState("d", props.i, {editingTitle: false});
@@ -94,7 +96,7 @@ const Title: Component<{decision: TDecision, i: number}> = (props) => {
           }>
             <input
               class="input" value={props.decision.title}
-              onkeydown={editingTitle}></input>
+              onkeyup={editingTitle}></input>
           </Show>
         </div>
       </div>
@@ -165,6 +167,17 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
     setState("d", props.i, "factors", props.f, "name",
       (e.target as HTMLSpanElement).textContent!.toString());
   };
+  const factorKeyUp = (e: KeyboardEvent) => {
+    const target = e.target as HTMLSpanElement;
+    if (e.key == 'Enter') {
+      // Works but there's a visual glitch. Next time use an input triggered by
+      // onclick instead.
+      target.textContent = target.textContent!.replace(/\n/g, ' ');
+    }
+    if (e.key == 'Enter' || e.key == 'Escape') {
+      target.blur();
+    }
+  }
 
   return (
     <div style="gap: 0" class="level" classList={{"is-mobile": !props.decision.gearing}}>
@@ -178,6 +191,7 @@ const FactorName: Component<{decision: TDecision, i: number, f: number}> = (prop
           }}
           role="textbox" contenteditable={!props.decision.gearing}
           onBlur={changedName}
+          onKeyUp={factorKeyUp}
           onFocus={(e) => e.target.textContent = name()}
         >
           {name()}
@@ -305,6 +319,17 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
       parseFloat((e.target as HTMLSpanElement).textContent!.trim())
     )
   };
+  const optionKeyUp = (e: KeyboardEvent) => {
+    const target = e.target as HTMLSpanElement;
+    if (e.key == 'Enter') {
+      // Works but there's a visual glitch. Next time use an input triggered by
+      // onclick instead.
+      target.textContent = target.textContent!.replace(/\n/g, ' ');
+    }
+    if (e.key == 'Enter' || e.key == 'Escape') {
+      target.blur();
+    }
+  }
 
   return <tr classList={{"gearing": props.decision.gearing}}>
     <td style={
@@ -322,6 +347,7 @@ const TblRow: Component<{decision: TDecision, i: number, o: number}> = (props) =
       <span style="width:min-content;height:1.5rem;"
         contenteditable={!props.decision.gearing}
         onFocus={(e) => e.target.textContent = O().name}
+        onKeyUp={optionKeyUp}
         onBlur={changedOption}>{O().name}</span>
     </td>
     {/* Values */}
